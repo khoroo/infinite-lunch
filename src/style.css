@@ -1,0 +1,100 @@
+@import "/node_modules/ol/ol.css";
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 50px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+#solveButton {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+#output {
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+/* Add styles for city search */
+.city-picker-container {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.city-search-input {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.search-results {
+  border: 1px solid #ccc;
+  max-height: 300px;
+  overflow-y: auto;
+  position: relative;
+  background: white;
+  margin-bottom: 20px;
+}
+
+.search-results ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.search-results li {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.search-results li:hover,
+.search-results li.selected {
+  background-color: #f0f0f0;
+}
+
+.selected-cities li {
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.selected-cities button {
+  margin-left: 10px;
+  padding: 3px 8px;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+table td {
+  border: none;
+  padding: 0 10px;
+}
+
+#map {
+  width: 100%;
+  height: 400px; /* Adjust as needed */
+  margin-top: 20px; /* Add some space between the city picker and the map */
+  position: relative; /* Remove absolute positioning */
+}

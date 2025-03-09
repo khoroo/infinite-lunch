@@ -1,0 +1,21 @@
+{
+  "name": "infinite-lunch",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "build": "tsc && vite build",
+    "serve": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^6.2.0",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "ol": "latest",
+    "fuse.js": "^7.1.0",
+    "geodesy": "^2.4.0",
+    "luxon": "^3.5.0",
+    "minizinc": "^4.4.1"
+  }
+}
