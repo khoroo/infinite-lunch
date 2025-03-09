@@ -3,6 +3,7 @@ import { Map as OLMap, View } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
 import Fuse, { FuseResult } from 'fuse.js'
+import { setupSolveButton } from './solver.ts';
 
 // Types
 export interface City {
@@ -32,13 +33,13 @@ function loadCities(): Promise<City[]> {
         .then(data => {
             state.cities = data;
             state.fuse = new Fuse(state.cities, {
-              keys: ['name'],
-              threshold: 0.3,
-              sortFn: (a, b) => {
-                const itemA = state.cities[a.idx];
-                const itemB = state.cities[b.idx];
-                return itemB.population - itemA.population; // Sort by population (descending)
-              }
+                keys: ['name'],
+                threshold: 0.3,
+                sortFn: (a, b) => {
+                    const itemA = state.cities[a.idx];
+                    const itemB = state.cities[b.idx];
+                    return itemB.population - itemA.population; // Sort by population (descending)
+                }
             });
             console.log(`Loaded ${state.cities.length} cities`);
             return data;
@@ -97,7 +98,7 @@ function handleSearch(event: Event): void {
     const query = (event.target as HTMLInputElement).value.trim();
     const results = searchCities(query);
     const resultsContainer = getElement<HTMLElement>('.search-results');
-    
+
     state.selectedSearchIndex = 0;
     displayResults(results, resultsContainer);
 }
@@ -115,7 +116,7 @@ function displayResults(results: FuseResult<City>[], container: HTMLElement): vo
     results.forEach((result, index) => {
         const city = result.item;
         const li = createElement('li', { textContent: getCityDisplayName(city) });
-        
+
         li.addEventListener('click', () => selectCity(city));
         li.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') selectCity(city);
@@ -166,10 +167,10 @@ function updateSelectedCitiesUI(): void {
 
     state.selectedCities.forEach(city => {
         const li = createElement('li', { textContent: getCityDisplayName(city) });
-        
+
         const removeBtn = createElement('button', { textContent: 'Remove' });
         removeBtn.addEventListener('click', () => removeCity(city));
-        
+
         li.appendChild(removeBtn);
         ul.appendChild(li);
     });
@@ -189,7 +190,7 @@ function setupKeyboardNavigation(searchInput: HTMLInputElement): void {
     searchInput.addEventListener('keydown', (event: KeyboardEvent) => {
         const resultsItems = document.querySelectorAll('.search-results li');
         const itemCount = resultsItems.length;
-        
+
         if (itemCount === 0) return;
 
         switch (event.key) {
@@ -198,13 +199,13 @@ function setupKeyboardNavigation(searchInput: HTMLInputElement): void {
                 state.selectedSearchIndex = (state.selectedSearchIndex + 1) % itemCount;
                 updateSelectedResult(resultsItems, state.selectedSearchIndex);
                 break;
-                
+
             case 'ArrowUp':
                 event.preventDefault();
                 state.selectedSearchIndex = (state.selectedSearchIndex - 1 + itemCount) % itemCount;
                 updateSelectedResult(resultsItems, state.selectedSearchIndex);
                 break;
-                
+
             case 'Enter':
                 event.preventDefault();
                 if (itemCount > 0) {
@@ -283,7 +284,7 @@ function setupPresetButtons(): void {
             // Set state values
             state.speedMin = 500;
             state.speedMax = 900;
-            
+
             // Update input fields
             const speedMinInput = getElement<HTMLInputElement>('#speedMin');
             const speedMaxInput = getElement<HTMLInputElement>('#speedMax');
@@ -296,7 +297,7 @@ function setupPresetButtons(): void {
         concordeButton.addEventListener('click', () => {
             state.speedMin = 500;
             state.speedMax = 2500;
-            
+
             const speedMinInput = getElement<HTMLInputElement>('#speedMin');
             const speedMaxInput = getElement<HTMLInputElement>('#speedMax');
             speedMinInput.value = state.speedMin.toString();
@@ -308,7 +309,7 @@ function setupPresetButtons(): void {
         extremeButton.addEventListener('click', () => {
             state.speedMin = 13;
             state.speedMax = 7200;
-            
+
             const speedMinInput = getElement<HTMLInputElement>('#speedMin');
             const speedMaxInput = getElement<HTMLInputElement>('#speedMax');
             speedMinInput.value = state.speedMin.toString();
@@ -355,14 +356,15 @@ function setupSearchUI(): void {
 
 // Initialization
 function initialize(): void {
-  
-  loadCities().catch(error => {
-      console.error('Error loading cities data:', error);
-  });
+
+    loadCities().catch(error => {
+        console.error('Error loading cities data:', error);
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  initialize(); 
+    initialize();
+    setupSolveButton(state, getElement);
     setupSearchUI();
     setupRelativeShiftInput();
     setupSpeedMinInput();
