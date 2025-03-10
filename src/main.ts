@@ -34,7 +34,7 @@ const state = {
 
 // API
 function loadCities(): Promise<City[]> {
-    return fetch('/cities.json')
+    return fetch('./cities.json')
         .then(response => response.json())
         .then(data => {
             state.cities = data;
