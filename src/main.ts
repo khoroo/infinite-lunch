@@ -12,6 +12,8 @@ import { Circle, Style, Fill, Stroke, Text } from 'ol/style';
 import { fromLonLat } from 'ol/proj';
 import { DateTime } from 'luxon';
 import LineString from 'ol/geom/LineString';
+// Add arc.js import
+import * as arcjs from 'arc';
 
 // Types
 export interface City {
@@ -505,6 +507,67 @@ function setupMap(): void {
 }
 
 // Great Circle Arc Functions
+function drawGreatCircleArc(from: City, to: City): Feature {
+    try {
+        // Create an arc circle between the two locations using arc.js
+        const arcGenerator = new arcjs.GreatCircle(
+            { x: from.longitude, y: from.latitude },
+            { x: to.longitude, y: to.latitude }
+        );
+
+        // Calculate the arc with 100 points
+        const arcLine = arcGenerator.Arc(100);
+        const features: Feature[] = [];
+        
+        // Handle paths that cross the meridian - arc.js handles this automatically
+        arcLine.geometries.forEach(function (geometry) {
+            const lineCoords = geometry.coords.map(coord => fromLonLat([coord[0], coord[1]]));
+            
+            const lineFeature = new Feature({
+                geometry: new LineString(lineCoords)
+            });
+            
+            // Style the line with a more visible appearance
+            lineFeature.setStyle(new Style({
+                stroke: new Stroke({
+                    color: '#3388ff',  // Blue color
+                    width: 3
+                })
+            }));
+            
+            // Add to vector source
+            vectorSource.addFeature(lineFeature);
+            features.push(lineFeature);
+        });
+        
+        console.log("Arc drawn:", from.name, "to", to.name);
+        
+        // Return the first feature as a representative (for compatibility with existing code)
+        return features[0] || new Feature();
+    } catch (error) {
+        console.error("Error drawing great circle arc:", error);
+        
+        // Fallback to the original implementation if arc.js fails
+        const arcPoints = calculateGreatCircleArc(from, to);
+        const lineCoordinates = arcPoints.map(point => fromLonLat([point.lon, point.lat]));
+        
+        const lineFeature = new Feature({
+            geometry: new LineString(lineCoordinates)
+        });
+        
+        lineFeature.setStyle(new Style({
+            stroke: new Stroke({
+                color: '#ff0000',  // Red for the fallback
+                width: 3
+            })
+        }));
+        
+        vectorSource.addFeature(lineFeature);
+        return lineFeature;
+    }
+}
+
+// Keep the original calculation function as a fallback
 function calculateGreatCircleArc(from: City, to: City, numPoints: number = 100): ArcCoordinates[] {
     const points: ArcCoordinates[] = [];
     
@@ -536,34 +599,6 @@ function calculateGreatCircleArc(from: City, to: City, numPoints: number = 100):
     }
     
     return points;
-}
-
-function drawGreatCircleArc(from: City, to: City): Feature {
-    // Calculate arc points
-    const arcPoints = calculateGreatCircleArc(from, to);
-    
-    // Convert to OpenLayers format
-    const lineCoordinates = arcPoints.map(point => fromLonLat([point.lon, point.lat]));
-    
-    // Create feature with line geometry
-    const lineFeature = new Feature({
-        geometry: new LineString(lineCoordinates)
-    });
-    
-    // Style the line - make it more visible
-    lineFeature.setStyle(new Style({
-        stroke: new Stroke({
-            color: '#ff0000',  // Bright red for visibility
-            width: 3,
-            // Remove lineDash for continuous line
-        })
-    }));
-    
-    // Add to vector source
-    vectorSource.addFeature(lineFeature);
-    console.log("Arc drawn:", from.name, "to", to.name);
-    
-    return lineFeature;
 }
 
 function clearArcs(): void {
