@@ -173,7 +173,6 @@ function drawGreatCircleArc(from: City, to: City): Feature {
             features.push(lineFeature);
         });
 
-        console.log("Arc drawn:", from.name, "to", to.name, "Distance:", distance, "Color:", arcColor);
         return features[0] || new Feature();
     } catch (error) {
         console.error("Error drawing great circle arc:", error);
@@ -677,7 +676,6 @@ function setupSolveButton(
                                 isSelected: target.classList.contains('selected')
                             }
                         });
-                        console.log("Dispatching solution-click event", target.classList.contains('selected'));
                         document.dispatchEvent(solutionClickEvent);
                     });
                 });
