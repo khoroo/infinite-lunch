@@ -144,7 +144,6 @@ function updateSelectedResult(items: NodeListOf<Element>, index: number): void {
 // Map Related
 let vectorSource: VectorSource;
 let vectorLayer: VectorLayer;
-let map: OLMap;
 
 function addCityMarker(city: City, index: number): void {
     const iconStyle = new Style({
@@ -419,7 +418,7 @@ function setupMap(): void {
             source: vectorSource,
         });
 
-        map = new OLMap({
+        new OLMap({
             target: 'map',
             layers: [
                 new TileLayer({
