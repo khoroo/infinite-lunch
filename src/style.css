@@ -206,3 +206,141 @@ table td {
   border: 2px dashed black;
   box-shadow: 0 0 8px rgba(0, 119, 204, 0.3);
 }
+
+.clock-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, auto);
+  justify-items: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.clock-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.clock {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  background-color: white;
+  border: 8px solid black;
+  border-radius: 50%;
+}
+
+.hour-marker {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hour-marker div {
+  position: absolute;
+  width: 8px;
+  height: 20px;
+  background-color: black;
+  /* Hour markers set to black */
+  left: 50%;
+  top: 10px;
+  transform-origin: center 140px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.hand {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  transform-origin: bottom;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.hour-hand {
+  width: 8px;
+  height: 60px;
+  background-color: black;
+  z-index: 5; /* Higher z-index makes it appear on top of everything */
+}
+
+.minute-hand {
+  width: 6px;
+  height: 85px;
+  background-color: black;
+}
+
+.second-hand {
+  width: 2px;
+  height: 90px;
+  background-color: red;
+  animation: rotate 60s linear infinite;
+}
+
+.second-hand::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: red;
+  border-radius: 50%;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@keyframes rotate {
+  100% {
+      transform: translateX(-50%) rotate(360deg);
+  }
+}
+
+.center-dot {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background-color: black;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+}
+
+.time-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px; /* Add some space between clock and inputs */
+}
+
+.time-inputs input {
+  width: 50px; /* Adjust input width */
+}
+
+.time-inputs input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: auto; /* Ensure up and down arrows are visible */
+}
+
+.time-inputs input[type="number"]::-webkit-outer-spin-button,
+.time-inputs input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: auto; /* Ensure up and down arrows are visible */
+  margin: 0;
+}
+
+.clock-label {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* We don't need this anymore since we're using clock-label */
+.clock-row {
+  display: none;
+}

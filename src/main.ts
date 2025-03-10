@@ -14,6 +14,7 @@ import * as arcjs from 'arc';
 import { Model } from 'https://cdn.jsdelivr.net/npm/minizinc/dist/minizinc.mjs';
 import LatLon from 'geodesy/latlon-ellipsoidal-vincenty.js';
 import { DateTime } from 'luxon';
+import './clock';
 
 // --- Types ---
 export interface City {
