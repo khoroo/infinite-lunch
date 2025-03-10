@@ -565,7 +565,7 @@ function parseSolution(solution: any, modelData: ModelData, cities: City[], spee
     let route: RouteLeg[] = [];
     let currentCityIndex = 0;
 
-    for (let i = 0; i < cities.length - 1; i++) {
+    for (let i = 0; i < cities.length; i++) {  // Changed from cities.length - 1 to cities.length
         let nextEdgeIndex = -1;
         for (let j = 0; j < edges.length; j++) {
             if (edges[j][0] === currentCityIndex + 1 && x[j] === 1) {
