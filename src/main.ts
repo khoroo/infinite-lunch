@@ -458,7 +458,7 @@ function initialize(): void {
 
 document.addEventListener('DOMContentLoaded', () => {
     initialize();
-    setupSolveButton(state, getElement);
+    setupSolveButton(state);
     setupSearchUI();
     setupRelativeShiftInput();
     setupSpeedMinInput();
