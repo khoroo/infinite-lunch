@@ -1,4 +1,5 @@
 export default {
+  base: 'https://robert.sparks.me.uk/infinite-lunch/',
   build: {
     sourcemap: true,
     rollupOptions: {
