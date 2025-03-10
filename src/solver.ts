@@ -163,7 +163,7 @@ function parseSolution(solution: any, modelData: ModelData, cities: City[], spee
     }
 
     const resultHtml = generateRouteHtml(route);
-    return resultHtml;
+    return `<div class="solution-container">${resultHtml}</div>`;
 }
 
 // --- Setup Solve Button Function ---
@@ -231,6 +231,19 @@ function setupSolveButton(
             })
             .then(result => {
                 routeContainer.innerHTML += `<p>Status: ${result.status}</p>`;
+                // Add click event listener to solution containers
+                const solutionContainers = routeContainer.querySelectorAll('.solution-container');
+                solutionContainers.forEach(container => {
+                    container.addEventListener('click', (event) => {
+                        const target = event.currentTarget as HTMLElement;
+                        // Toggle 'selected' class
+                        target.classList.toggle('selected');
+                        // Dispatch custom event
+                        const solutionData = target.innerHTML;
+                        const solutionClickEvent = new CustomEvent('solution-click', { detail: solutionData });
+                        document.dispatchEvent(solutionClickEvent);
+                    });
+                });
             })
             .catch(error => {
                 console.error('Error loading TSP model or solving:', error);

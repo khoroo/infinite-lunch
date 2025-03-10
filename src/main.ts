@@ -507,4 +507,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setupSpeedMaxInput();
     setupPresetButtons();
     setupMap();
+
+    document.addEventListener('solution-click', (event: Event) => {
+        const customEvent = event as CustomEvent;
+        console.log(customEvent);
+    });
 });

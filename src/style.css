@@ -171,3 +171,15 @@ table td {
     margin-bottom: 20px;
   }
 }
+/* Add styles for solution container */
+.solution-container {
+  border: 2px solid transparent;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.solution-container.selected {
+  border: 2px dashed black;
+}
