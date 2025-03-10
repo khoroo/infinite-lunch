@@ -70,7 +70,6 @@ const state = {
     fuse: null as Fuse<City> | null,
     selectedCities: [] as City[],
     selectedSearchIndex: 0,
-    relativeShift: -120,
     speedMin: 0,
     speedMax: 0,
     currentArcs: [] as Feature[]
@@ -623,7 +622,27 @@ function setupSolveButton(
 
         const distanceMatrix = calculateDistanceMatrix(state.selectedCities);
         const timeMatrix = calculateTimeMatrix(state.selectedCities);
-        const durationMatrix = calculateDurationMatrix(timeMatrix, state.relativeShift);
+
+        // Get the time difference from the clock elements
+        const leftHour = parseInt((document.getElementById(`hourInput-left`) as HTMLInputElement).value);
+        const leftMinute = parseInt((document.getElementById(`minuteInput-left`) as HTMLInputElement).value);
+        const leftAmPm = (document.getElementById(`ampmToggle-left`) as HTMLButtonElement).textContent;
+        const rightHour = parseInt((document.getElementById(`hourInput-right`) as HTMLInputElement).value);
+        const rightMinute = parseInt((document.getElementById(`minuteInput-right`) as HTMLInputElement).value);
+        const rightAmPm = (document.getElementById(`ampmToggle-right`) as HTMLButtonElement).textContent;
+
+        // Convert to minutes from midnight
+        let leftTime = leftHour * 60 + leftMinute;
+        if (leftAmPm === 'PM' && leftHour !== 12) leftTime += 12 * 60;
+        if (leftAmPm === 'AM' && leftHour === 12) leftTime -= 12 * 60; // Adjust for midnight
+
+        let rightTime = rightHour * 60 + rightMinute;
+        if (rightAmPm === 'PM' && rightHour !== 12) rightTime += 12 * 60;
+        if (rightAmPm === 'AM' && rightHour === 12) rightTime -= 12 * 60; // Adjust for midnight
+
+        const timeDelta = leftTime - rightTime;
+
+        const durationMatrix = calculateDurationMatrix(timeMatrix, timeDelta);
         const speedMatrix = calculateSpeedMatrix(distanceMatrix, durationMatrix);
         const modelData = createModelData(speedMatrix, durationMatrix, state.speedMin, state.speedMax);
 
@@ -704,10 +723,6 @@ function parseNumericInput(value: string): number {
     return parseInt(value, 10) || 0;
 }
 
-const handleRelativeShiftChange = (event: Event): void => {
-    state.relativeShift = parseNumericInput((event.target as HTMLInputElement).value);
-};
-
 const handleSpeedMinChange = (event: Event): void => {
     state.speedMin = parseNumericInput((event.target as HTMLInputElement).value);
 };
@@ -715,17 +730,6 @@ const handleSpeedMinChange = (event: Event): void => {
 const handleSpeedMaxChange = (event: Event): void => {
     state.speedMax = parseNumericInput((event.target as HTMLInputElement).value);
 };
-
-function setupRelativeShiftInput(): void {
-    try {
-        const relativeShiftInput = getElement<HTMLInputElement>('#relativeShift');
-        state.relativeShift = parseNumericInput(relativeShiftInput.value);
-        relativeShiftInput.addEventListener('change', handleRelativeShiftChange);
-        console.log("Relative shift input setup complete");
-    } catch (error) {
-        console.error("Failed to set up relative shift input:", error);
-    }
-}
 
 function setupSpeedMinInput(): void {
     try {
@@ -908,7 +912,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initialize();
     setupSolveButton(state);
     setupSearchUI();
-    setupRelativeShiftInput();
     setupSpeedMinInput();
     setupSpeedMaxInput();
     setupPresetButtons();
