@@ -11,6 +11,7 @@ import VectorLayer from 'ol/layer/Vector';
 import { Circle, Style, Fill, Stroke, Text } from 'ol/style';
 import { fromLonLat } from 'ol/proj';
 import { DateTime } from 'luxon';
+import LineString from 'ol/geom/LineString';
 
 // Types
 export interface City {
@@ -22,6 +23,30 @@ export interface City {
     population: number;
 }
 
+export interface RouteSegment {
+    from: City;
+    to: City;
+    distance: number;  // in kilometers
+}
+
+export interface Route {
+    cities: City[];
+    segments: RouteSegment[];
+    totalDistance: number;
+}
+
+export interface ArcCoordinates {
+    lon: number;
+    lat: number;
+}
+
+export interface GreatCircleArc {
+    from: City;
+    to: City;
+    points: ArcCoordinates[];  // Interpolated points along the great circle
+    distance: number;
+}
+
 // State
 const state = {
     cities: [] as City[],
@@ -30,7 +55,8 @@ const state = {
     selectedSearchIndex: 0,
     relativeShift: -120, // Default value matching the HTML
     speedMin: 0,        // Default value for minimum speed
-    speedMax: 0         // Default value for maximum speed
+    speedMax: 0,         // Default value for maximum speed,
+    currentArcs: [] as Feature[] // Store current arc features for clearing later
 };
 
 // API
@@ -478,6 +504,116 @@ function setupMap(): void {
     }
 }
 
+// Great Circle Arc Functions
+function calculateGreatCircleArc(from: City, to: City, numPoints: number = 100): ArcCoordinates[] {
+    const points: ArcCoordinates[] = [];
+    
+    // Convert to radians
+    const lat1 = from.latitude * Math.PI / 180;
+    const lon1 = from.longitude * Math.PI / 180;
+    const lat2 = to.latitude * Math.PI / 180;
+    const lon2 = to.longitude * Math.PI / 180;
+    
+    // Calculate great circle points
+    for (let i = 0; i <= numPoints; i++) {
+        const f = i / numPoints;
+        
+        // Calculate intermediate point at fraction f along the route
+        const A = Math.sin((1 - f) * Math.PI) / Math.sin(Math.PI);
+        const B = Math.sin(f * Math.PI) / Math.sin(Math.PI);
+        
+        const x = A * Math.cos(lat1) * Math.cos(lon1) + B * Math.cos(lat2) * Math.cos(lon2);
+        const y = A * Math.cos(lat1) * Math.sin(lon1) + B * Math.cos(lat2) * Math.sin(lon2);
+        const z = A * Math.sin(lat1) + B * Math.sin(lat2);
+        
+        const lat = Math.atan2(z, Math.sqrt(x * x + y * y));
+        const lon = Math.atan2(y, x);
+        
+        points.push({
+            lat: lat * 180 / Math.PI,
+            lon: lon * 180 / Math.PI
+        });
+    }
+    
+    return points;
+}
+
+function drawGreatCircleArc(from: City, to: City): Feature {
+    // Calculate arc points
+    const arcPoints = calculateGreatCircleArc(from, to);
+    
+    // Convert to OpenLayers format
+    const lineCoordinates = arcPoints.map(point => fromLonLat([point.lon, point.lat]));
+    
+    // Create feature with line geometry
+    const lineFeature = new Feature({
+        geometry: new LineString(lineCoordinates)
+    });
+    
+    // Style the line - make it more visible
+    lineFeature.setStyle(new Style({
+        stroke: new Stroke({
+            color: '#ff0000',  // Bright red for visibility
+            width: 3,
+            // Remove lineDash for continuous line
+        })
+    }));
+    
+    // Add to vector source
+    vectorSource.addFeature(lineFeature);
+    console.log("Arc drawn:", from.name, "to", to.name);
+    
+    return lineFeature;
+}
+
+function clearArcs(): void {
+    // Remove all current arcs from the map
+    state.currentArcs.forEach(feature => vectorSource.removeFeature(feature));
+    state.currentArcs = [];
+}
+
+function drawRouteArcs(routeData: Array<{from: string, to: string}>): void {
+    // First clear any existing arcs
+    clearArcs();
+    
+    // Draw each segment of the route
+    routeData.forEach(segment => {
+        // Find matching cities by name
+        const fromCity = state.selectedCities.find(city => city.name === segment.from);
+        const toCity = state.selectedCities.find(city => city.name === segment.to);
+        
+        if (fromCity && toCity) {
+            const arcFeature = drawGreatCircleArc(fromCity, toCity);
+            state.currentArcs.push(arcFeature);
+        }
+    });
+}
+
+function parseRouteFromHtml(htmlContent: string): Array<{from: string, to: string}> {
+    const route: Array<{from: string, to: string}> = [];
+    
+    // Create a temporary element to parse the HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlContent;
+    
+    // Find the table rows (skip header and total row)
+    const rows = tempDiv.querySelectorAll('.route-table tr');
+    
+    // Skip the header row (index 0) and the total row (last row)
+    for (let i = 1; i < rows.length - 1; i++) {
+        const cells = rows[i].querySelectorAll('td');
+        if (cells.length >= 2) {
+            route.push({
+                from: cells[0].textContent?.trim() || '',
+                to: cells[1].textContent?.trim() || ''
+            });
+        }
+    }
+    
+    console.log("Parsed route:", route);
+    return route;
+}
+
 // UI Setup
 function setupSearchUI(): void {
     try {
@@ -510,6 +646,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('solution-click', (event: Event) => {
         const customEvent = event as CustomEvent;
-        console.log(customEvent);
+        console.log("Solution click event received:", customEvent.detail);
+        
+        // Check if the target has the 'selected' class using the detail object structure
+        const isSelected = customEvent.detail.isSelected;
+        
+        if (isSelected) {
+            // Parse the route data from the HTML using the html property
+            const routeData = parseRouteFromHtml(customEvent.detail.html);
+            console.log("Drawing route arcs for:", routeData);
+            // Draw the arcs for this route
+            drawRouteArcs(routeData);
+        } else {
+            // If deselected, clear the arcs
+            console.log("Clearing arcs");
+            clearArcs();
+        }
     });
 });

@@ -108,7 +108,7 @@ function generateRouteHtml(route: Array<{ from: string; to: string; duration: st
             <td>${leg.from}</td>
             <td>${leg.to}</td>
             <td>${leg.duration}</td>
-            <td>${leg.speed}</td>
+            <td>${leg.speed} km/h</td>
         </tr>`;
     });
     const totalDurationHours = Math.floor(totalDurationMinutes / 60);
@@ -117,7 +117,7 @@ function generateRouteHtml(route: Array<{ from: string; to: string; duration: st
     if (remainingMinutes > 0) {
         totalDurationString += ` ${remainingMinutes}mins`;
     }
-    html += `<tr>
+    html += `<tr class="total-row">
         <td colspan="2"><b>Total Duration</b></td>
         <td colspan="2"><b>${totalDurationString}</b></td>
     </tr>`;
@@ -235,12 +235,24 @@ function setupSolveButton(
                 const solutionContainers = routeContainer.querySelectorAll('.solution-container');
                 solutionContainers.forEach(container => {
                     container.addEventListener('click', (event) => {
+                        // First, remove 'selected' class from all solutions
+                        document.querySelectorAll('.solution-container').forEach(c => {
+                            if (c !== container) c.classList.remove('selected');
+                        });
+                        
                         const target = event.currentTarget as HTMLElement;
                         // Toggle 'selected' class
                         target.classList.toggle('selected');
-                        // Dispatch custom event
-                        const solutionData = target.innerHTML;
-                        const solutionClickEvent = new CustomEvent('solution-click', { detail: solutionData });
+                        
+                        // Dispatch custom event with proper data structure
+                        const solutionClickEvent = new CustomEvent('solution-click', { 
+                            detail: {
+                                html: target.innerHTML,
+                                target: target,
+                                isSelected: target.classList.contains('selected')
+                            }
+                        });
+                        console.log("Dispatching solution-click event", target.classList.contains('selected'));
                         document.dispatchEvent(solutionClickEvent);
                     });
                 });

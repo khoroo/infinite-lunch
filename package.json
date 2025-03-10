@@ -13,6 +13,7 @@
     "vite": "^6.2.0"
   },
   "dependencies": {
+    "arc": "^0.1.4",
     "fuse.js": "^7.1.0",
     "geodesy": "^2.4.0",
     "gh-pages": "^6.3.0",
