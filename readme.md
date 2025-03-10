@@ -1,4 +1,3 @@
-#Infinite Lunch
 # Infinite Lunch
 
 A time-traveling route planner that lets you journey between cities while always departing and arriving at the same local time.
