@@ -723,12 +723,43 @@ function parseNumericInput(value: string): number {
     return parseInt(value, 10) || 0;
 }
 
+function updateColorScale(min: number, max: number): void {
+    const labelsContainer = document.querySelector('.color-scale-labels') as HTMLElement;
+    
+    // Clear existing labels
+    labelsContainer.innerHTML = '';
+    
+    // Add min label
+    const minLabel = document.createElement('span');
+    minLabel.textContent = `${min} km/h`;
+    labelsContainer.appendChild(minLabel);
+    
+    // Add intermediate labels if the range is large enough
+    const range = max - min;
+    if (range > 500) {
+        // Add quarter points
+        for (let i = 1; i <= 3; i++) {
+            const value = min + Math.round((range * i) / 4);
+            const label = document.createElement('span');
+            label.textContent = `${value} km/h`;
+            labelsContainer.appendChild(label);
+        }
+    }
+    
+    // Add max label
+    const maxLabel = document.createElement('span');
+    maxLabel.textContent = `${max} km/h`;
+    labelsContainer.appendChild(maxLabel);
+}
+
 const handleSpeedMinChange = (event: Event): void => {
     state.speedMin = parseNumericInput((event.target as HTMLInputElement).value);
+    updateColorScale(state.speedMin, state.speedMax);
 };
 
 const handleSpeedMaxChange = (event: Event): void => {
     state.speedMax = parseNumericInput((event.target as HTMLInputElement).value);
+    updateColorScale(state.speedMin, state.speedMax);
 };
 
 function setupSpeedMinInput(): void {
@@ -764,6 +795,7 @@ function setupPresetButtons(): void {
             const speedMaxInput = getElement<HTMLInputElement>('#speedMax');
             speedMinInput.value = state.speedMin.toString();
             speedMaxInput.value = state.speedMax.toString();
+            updateColorScale(state.speedMin, state.speedMax);
         });
 
         const concordeButton = getElement<HTMLButtonElement>('#concordeButton');
@@ -775,6 +807,7 @@ function setupPresetButtons(): void {
             const speedMaxInput = getElement<HTMLInputElement>('#speedMax');
             speedMinInput.value = state.speedMin.toString();
             speedMaxInput.value = state.speedMax.toString();
+            updateColorScale(state.speedMin, state.speedMax);
         });
 
         const extremeButton = getElement<HTMLButtonElement>('#extremeButton');
@@ -786,6 +819,7 @@ function setupPresetButtons(): void {
             const speedMaxInput = getElement<HTMLInputElement>('#speedMax');
             speedMinInput.value = state.speedMin.toString();
             speedMaxInput.value = state.speedMax.toString();
+            updateColorScale(state.speedMin, state.speedMax);
         });
 
         console.log("Preset buttons setup complete");
@@ -916,6 +950,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setupSpeedMaxInput();
     setupPresetButtons();
     setupMap();
+    
+    // Initialize color scale with default values
+    updateColorScale(state.speedMin, state.speedMax);
 
     document.addEventListener('solution-click', (event: Event) => {
         const customEvent = event as CustomEvent;

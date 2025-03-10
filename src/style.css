@@ -344,3 +344,38 @@ table td {
 .clock-row {
   display: none;
 }
+
+/* Color scale styles */
+.color-scale-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 15px auto;
+}
+
+.color-scale {
+  height: 30px;
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: linear-gradient(to right, 
+    rgb(13, 8, 135), 
+    rgb(85, 0, 170), 
+    rgb(156, 23, 158), 
+    rgb(205, 62, 78), 
+    rgb(246, 147, 34), 
+    rgb(252, 225, 56)
+  );
+}
+
+.color-scale-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+.color-scale-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-align: center;
+}
