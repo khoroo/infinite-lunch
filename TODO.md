@@ -12,4 +12,7 @@
 - [ ] pre warn if edge graph not connected enough to solve
   - [ ] state what edges are failing
   - [ ] suggest how to get to viable solution
+- [ ] sort out liscenses / linking to sources
+  - [ ] link to minizinc problem github
+  - [ ] add all liscences
 ```
