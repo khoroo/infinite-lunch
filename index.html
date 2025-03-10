@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>MiniZinc app</title>
+  <script type="module" crossorigin src="/assets/index-Bxb9bgFM.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-CHPE8orl.css">
+</head>
+
+<body>
+  <h1>Infinite Lunch</h1>
+  <div id="map"></div>
+  <div class="city-picker-container">
+    <input type="text" class="city-search-input" placeholder="Search for cities...">
+    <div class="search-results"></div>
+    <div class="selected-cities"></div>
+  </div>
+  <table>
+    <tr>
+      <td>Shift</td>
+      <td>Min</td>
+      <td>Max</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>
+        <input type="number" id="relativeShift" name="relativeShift" min="-1439" max="-1" value="-120">
+      </td>
+      <td>
+        <input type="number" id="speedMin" name="slider1" min="13" max="7200" value="13">
+      </td>
+      <td>
+        <input type="number" id="speedMax" name="slider2" min="13" max="7200" value="7200">
+      </td>
+      <td>
+        <button id="solveButton">Solve</button>
+      </td>
+    </tr>
+    <tr>
+      <td><button id="commercialButton">Commercial</button></td>
+      <td><button id="concordeButton">Concorde</button></td>
+      <td><button id="extremeButton">Extreme</button></td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <div id="output"></div>
+</body>
+
+</html>
