@@ -31,7 +31,6 @@ body {
 #solveButton {
   padding: 10px 20px;
   background-color: #4CAF50;
-  color: white;
   border: none;
   cursor: pointer;
   font-size: 16px;
@@ -48,7 +47,7 @@ body {
   width: 100%;
   max-width: 400px;
   margin-bottom: 20px;
-  margin-top: 20px;
+  margin-top: 30px; /* Increased top margin for better spacing after solve button */
   position: relative; /* Add this to make .search-results position relative to this container */
 }
 
@@ -378,4 +377,28 @@ table td {
   font-weight: bold;
   margin-bottom: 5px;
   text-align: center;
+}
+
+.solve-button-container {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.solve-button-container button {
+  width: 100%;
+  padding: 12px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.solve-button-container button:hover {
+  background-color: #45a049;
 }
