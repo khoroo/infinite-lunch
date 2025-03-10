@@ -168,15 +168,27 @@ function parseSolution(solution: any, modelData: ModelData, cities: City[], spee
 
 // --- Setup Solve Button Function ---
 function setupSolveButton(
-    state: any,
-    getElement: <T extends HTMLElement>(selector: string) => T
+    state: any
 ): void {
-    const solveButton = getElement<HTMLElement>('#solveButton');
-    const outputDiv = getElement<HTMLElement>('#output');
+    const solveButton = document.querySelector<HTMLElement>('#solveButton');
+    const outputDiv = document.querySelector<HTMLElement>('#output');
+    if (!solveButton || !outputDiv) return;
+
+    // Ensure we have a #routeContainer
+    let routeContainer = document.querySelector<HTMLElement>('#routeContainer');
+    if (!routeContainer) {
+        routeContainer = document.createElement('div'); // Added creation here
+        routeContainer.id = 'routeContainer';
+        routeContainer.style.display = 'none'; // Hide by default
+        outputDiv.appendChild(routeContainer);
+    }
 
     solveButton.addEventListener('click', () => {
+        routeContainer.innerHTML = ''; // Resets every time Solve is clicked
+        routeContainer.style.display = 'block'; // Show on click
+
         if (state.selectedCities.length < 2) {
-            outputDiv.innerHTML = '<p>Select at least two cities</p>';
+            routeContainer.innerHTML = '<p>Select at least two cities</p>';
             return;
         }
 
@@ -206,18 +218,23 @@ function setupSolveButton(
                 });
 
                 solve.on('solution', (solution: any) => {
-                    const routeString = parseSolution(solution, modelData, state.selectedCities, speedMatrix);
-                    outputDiv.innerHTML += routeString;
+                    const routeString = parseSolution(
+                        solution,
+                        modelData,
+                        state.selectedCities,
+                        speedMatrix
+                    );
+                    routeContainer.innerHTML += routeString;
                 });
 
                 return solve;
             })
             .then(result => {
-                outputDiv.innerHTML += `<p>Status: ${result.status}</p>`;
+                routeContainer.innerHTML += `<p>Status: ${result.status}</p>`;
             })
             .catch(error => {
                 console.error('Error loading TSP model or solving:', error);
-                outputDiv.innerHTML = `<p>Error: ${error.message}</p>`;
+                routeContainer.innerHTML = `<p>Error: ${error.message}</p>`;
             });
     });
 }
