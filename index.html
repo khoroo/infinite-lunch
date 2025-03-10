@@ -15,28 +15,36 @@
     <div id="color-scale" class="color-scale"></div>
     <div class="color-scale-labels"></div>
   </div>
-  <table>
+  <table class="speed-presets-table">
     <tr>
-      <td>&nbsp;</td>
-      <td>Min</td>
-      <td>Max</td>
-      <td>&nbsp;</td>
+      <th></th>
+      <th>Preset Name</th>
+      <th>Min (km/h)</th>
+      <th>Max (km/h)</th>
     </tr>
     <tr>
-      <td>&nbsp;</td>
-      <td>
-        <input type="number" id="speedMin" name="slider1" min="13" max="7200" value="13">
-      </td>
-      <td>
-        <input type="number" id="speedMax" name="slider2" min="13" max="7200" value="7200">
-      </td>
-      <td>&nbsp;</td>
+      <td><input type="radio" name="speedPreset" id="commercialPreset" value="commercial" checked></td>
+      <td><label for="commercialPreset">Commercial</label></td>
+      <td>500</td>
+      <td>900</td>
     </tr>
     <tr>
-      <td><button id="commercialButton">Commercial</button></td>
-      <td><button id="concordeButton">Concorde</button></td>
-      <td><button id="extremeButton">Extreme</button></td>
-      <td>&nbsp;</td>
+      <td><input type="radio" name="speedPreset" id="concordePreset" value="concorde"></td>
+      <td><label for="concordePreset">Concorde</label></td>
+      <td>500</td>
+      <td>2500</td>
+    </tr>
+    <tr>
+      <td><input type="radio" name="speedPreset" id="extremePreset" value="extreme"></td>
+      <td><label for="extremePreset">Extreme</label></td>
+      <td>13</td>
+      <td>7200</td>
+    </tr>
+    <tr>
+      <td><input type="radio" name="speedPreset" id="customPreset" value="custom"></td>
+      <td><label for="customPreset">Custom</label></td>
+      <td><input type="number" id="speedMin" name="customSpeedMin" min="13" max="7200" value="13" disabled></td>
+      <td><input type="number" id="speedMax" name="customSpeedMax" min="13" max="7200" value="7200" disabled></td>
     </tr>
   </table>
   <div class="clock-container"></div>

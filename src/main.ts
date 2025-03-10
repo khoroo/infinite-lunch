@@ -752,80 +752,74 @@ function updateColorScale(min: number, max: number): void {
     labelsContainer.appendChild(maxLabel);
 }
 
-const handleSpeedMinChange = (event: Event): void => {
-    state.speedMin = parseNumericInput((event.target as HTMLInputElement).value);
-    updateColorScale(state.speedMin, state.speedMax);
+// --- Speed Preset Configuration ---
+const presets = {
+  commercial: { min: 500, max: 900 },
+  concorde: { min: 500, max: 2500 },
+  extreme: { min: 13, max: 7200 },
+  custom: { min: 13, max: 7200 }
 };
 
-const handleSpeedMaxChange = (event: Event): void => {
-    state.speedMax = parseNumericInput((event.target as HTMLInputElement).value);
-    updateColorScale(state.speedMin, state.speedMax);
-};
-
-function setupSpeedMinInput(): void {
-    try {
-        const speedMinInput = getElement<HTMLInputElement>('#speedMin');
-        state.speedMin = parseInt(speedMinInput.value, 10);
-        speedMinInput.addEventListener('change', handleSpeedMinChange);
-        console.log("Speed min input setup complete");
-    } catch (error) {
-        console.error("Failed to set up speed min input:", error);
-    }
-}
-
-function setupSpeedMaxInput(): void {
-    try {
-        const speedMaxInput = getElement<HTMLInputElement>('#speedMax');
-        state.speedMax = parseInt(speedMaxInput.value, 10);
-        speedMaxInput.addEventListener('change', handleSpeedMaxChange);
-        console.log("Speed max input setup complete");
-    } catch (error) {
-        console.error("Failed to set up speed max input:", error);
-    }
-}
-
-function setupPresetButtons(): void {
-    try {
-        const commercialButton = getElement<HTMLButtonElement>('#commercialButton');
-        commercialButton.addEventListener('click', () => {
-            state.speedMin = 500;
-            state.speedMax = 900;
-
-            const speedMinInput = getElement<HTMLInputElement>('#speedMin');
-            const speedMaxInput = getElement<HTMLInputElement>('#speedMax');
-            speedMinInput.value = state.speedMin.toString();
-            speedMaxInput.value = state.speedMax.toString();
-            updateColorScale(state.speedMin, state.speedMax);
-        });
-
-        const concordeButton = getElement<HTMLButtonElement>('#concordeButton');
-        concordeButton.addEventListener('click', () => {
-            state.speedMin = 500;
-            state.speedMax = 2500;
-
-            const speedMinInput = getElement<HTMLInputElement>('#speedMin');
-            const speedMaxInput = getElement<HTMLInputElement>('#speedMax');
-            speedMinInput.value = state.speedMin.toString();
-            speedMaxInput.value = state.speedMax.toString();
-            updateColorScale(state.speedMin, state.speedMax);
-        });
-
-        const extremeButton = getElement<HTMLButtonElement>('#extremeButton');
-        extremeButton.addEventListener('click', () => {
-            state.speedMin = 13;
-            state.speedMax = 7200;
-
-            const speedMinInput = getElement<HTMLInputElement>('#speedMin');
-            const speedMaxInput = getElement<HTMLInputElement>('#speedMax');
-            speedMinInput.value = state.speedMin.toString();
-            speedMaxInput.value = state.speedMax.toString();
-            updateColorScale(state.speedMin, state.speedMax);
-        });
-
-        console.log("Preset buttons setup complete");
-    } catch (error) {
-        console.error("Failed to set up preset buttons:", error);
-    }
+function setupSpeedPresets(): void {
+  try {
+    const speedMinInput = getElement<HTMLInputElement>('#speedMin');
+    const speedMaxInput = getElement<HTMLInputElement>('#speedMax');
+    
+    // Initialize state with default values (Commercial)
+    state.speedMin = presets.commercial.min;
+    state.speedMax = presets.commercial.max;
+    
+    // Set up radio button listeners
+    document.querySelectorAll('input[name="speedPreset"]').forEach((radio) => {
+      radio.addEventListener('change', (event) => {
+        const presetType = (event.target as HTMLInputElement).value;
+        const preset = presets[presetType as keyof typeof presets];
+        
+        if (presetType === 'custom') {
+          // Enable custom inputs
+          speedMinInput.disabled = false;
+          speedMaxInput.disabled = false;
+          
+          // Use existing values or default
+          state.speedMin = parseInt(speedMinInput.value) || preset.min;
+          state.speedMax = parseInt(speedMaxInput.value) || preset.max;
+        } else {
+          // Disable custom inputs for fixed presets
+          speedMinInput.disabled = true;
+          speedMaxInput.disabled = true;
+          
+          // Set to preset values
+          state.speedMin = preset.min;
+          state.speedMax = preset.max;
+          
+          // Update input fields to show the preset values
+          speedMinInput.value = preset.min.toString();
+          speedMaxInput.value = preset.max.toString();
+        }
+        
+        updateColorScale(state.speedMin, state.speedMax);
+      });
+    });
+    
+    // Add listeners for custom input changes
+    speedMinInput.addEventListener('change', (event) => {
+      if (!speedMinInput.disabled) {
+        state.speedMin = parseInt((event.target as HTMLInputElement).value);
+        updateColorScale(state.speedMin, state.speedMax);
+      }
+    });
+    
+    speedMaxInput.addEventListener('change', (event) => {
+      if (!speedMaxInput.disabled) {
+        state.speedMax = parseInt((event.target as HTMLInputElement).value);
+        updateColorScale(state.speedMin, state.speedMax);
+      }
+    });
+    
+    console.log("Speed presets setup complete");
+  } catch (error) {
+    console.error("Failed to set up speed presets:", error);
+  }
 }
 
 // --- Utilities ---
@@ -946,9 +940,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initialize();
     setupSolveButton(state);
     setupSearchUI();
-    setupSpeedMinInput();
-    setupSpeedMaxInput();
-    setupPresetButtons();
+    setupSpeedPresets(); // Replace setupSpeedMinInput, setupSpeedMaxInput, and setupPresetButtons
     setupMap();
     
     // Initialize color scale with default values

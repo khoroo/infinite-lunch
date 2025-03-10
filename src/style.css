@@ -402,3 +402,42 @@ table td {
 .solve-button-container button:hover {
   background-color: #45a049;
 }
+
+/* Speed presets table styles */
+.speed-presets-table {
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  border-collapse: collapse;
+}
+
+.speed-presets-table th,
+.speed-presets-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.speed-presets-table th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+}
+
+.speed-presets-table input[type="radio"] {
+  cursor: pointer;
+}
+
+.speed-presets-table input[type="number"] {
+  width: 80px;
+  padding: 5px;
+}
+
+.speed-presets-table label {
+  cursor: pointer;
+  display: inline-block;
+  width: 100%;
+}
+
+.speed-presets-table tr:hover {
+  background-color: #f9f9f9;
+}
