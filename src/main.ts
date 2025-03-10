@@ -222,6 +222,7 @@ function removeCity(city: City): void {
     const index = state.selectedCities.indexOf(city);
     if (index > -1) {
         state.selectedCities.splice(index, 1);
+        clearArcs(); // Clear all arcs when a city is removed
         updateSelectedCitiesUI();
     }
 }
