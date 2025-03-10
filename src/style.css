@@ -14,6 +14,16 @@ body {
   padding-top: 50px;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 20px;
+}
+
+/* Adjust container width for desktop, use auto margins */
+body {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 #solveButton {
@@ -97,9 +107,10 @@ table td {
 }
 
 #map {
-  width: 100%;
-  height: 400px; /* Fixed height */
-  margin-top: 20px;
+  width: 800px;
+  height: 600px;
+  margin: 20px auto;
+  flex-shrink: 0; /* Prevent shrinking in a flex container */
 }
 
 .route-container {
@@ -136,4 +147,24 @@ table td {
 
 .route-table tr:nth-child(even) {
   background-color: #f9f9f9; /* Optional: Add alternating row colors */
+}
+
+/* Responsive single-column layout for mobile */
+@media (max-width: 768px) {
+  body {
+    width: 100%;
+    padding: 10px;
+  }
+
+  #map {
+    width: 100%;
+    height: 400px;
+    margin: 10px 0;
+  }
+
+  .city-picker-container,
+  table {
+    width: 100%;
+    margin-bottom: 20px;
+  }
 }
