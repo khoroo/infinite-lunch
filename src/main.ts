@@ -10,6 +10,7 @@ import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import { Circle, Style, Fill, Stroke, Text } from 'ol/style';
 import { fromLonLat } from 'ol/proj';
+import { DateTime } from 'luxon';
 
 // Types
 export interface City {
@@ -208,48 +209,74 @@ function updateSelectedCitiesUI(): void {
     const thead = createElement('thead');
     const headerRow = createElement('tr');
 
-    const numberHeader = createElement('th', { textContent: '#' });
-    numberHeader.style.padding = '8px';
-    numberHeader.style.borderBottom = '1px solid #ddd';
-    numberHeader.style.textAlign = 'left';
+    // Header for City Name
+    const cityNameHeader = createElement('th', { textContent: 'City Name' });
+    cityNameHeader.style.padding = '8px';
+    cityNameHeader.style.borderBottom = '1px solid #ddd';
+    cityNameHeader.style.textAlign = 'left';
 
-    const cityHeader = createElement('th', { textContent: 'City' });
-    cityHeader.style.padding = '8px';
-    cityHeader.style.borderBottom = '1px solid #ddd';
-    cityHeader.style.textAlign = 'left';
+    // Header for Flag (empty)
+    const flagHeader = createElement('th', { textContent: '' });
+    flagHeader.style.padding = '8px';
+    flagHeader.style.borderBottom = '1px solid #ddd';
+    flagHeader.style.textAlign = 'center';
 
-    headerRow.appendChild(numberHeader);
-    headerRow.appendChild(cityHeader);
+    // Header for UTC
+    const utcHeader = createElement('th', { textContent: 'UTC' });
+    utcHeader.style.padding = '8px';
+    utcHeader.style.borderBottom = '1px solid #ddd';
+    utcHeader.style.textAlign = 'center';
+
+    // Header for Remove button (empty)
+    const removeHeader = createElement('th', { textContent: '' });
+    removeHeader.style.padding = '8px';
+    removeHeader.style.borderBottom = '1px solid #ddd';
+    removeHeader.style.textAlign = 'center';
+
+    headerRow.appendChild(cityNameHeader);
+    headerRow.appendChild(flagHeader);
+    headerRow.appendChild(utcHeader);
+    headerRow.appendChild(removeHeader);
     thead.appendChild(headerRow);
     table.appendChild(thead);
 
     const tbody = createElement('tbody');
 
-    state.selectedCities.forEach((city, index) => {
+    state.selectedCities.forEach((city) => {
         const row = createElement('tr');
 
-        const numberCell = createElement('td', { textContent: String(index + 1) });
-        numberCell.style.padding = '8px';
-        numberCell.style.borderBottom = '1px solid #ddd';
-        numberCell.style.textAlign = 'center';
+        // City Name Cell
+        const cityNameCell = createElement('td', { textContent: city.name });
+        cityNameCell.style.padding = '8px';
+        cityNameCell.style.borderBottom = '1px solid #ddd';
+        cityNameCell.style.textAlign = 'left';
 
-        const cityCell = createElement('td');
-        cityCell.style.padding = '8px';
-        cityCell.style.borderBottom = '1px solid #ddd';
+        // Flag Cell
+        const flagCell = createElement('td', { textContent: countryCodeToEmoji(city.country_code) });
+        flagCell.style.padding = '8px';
+        flagCell.style.borderBottom = '1px solid #ddd';
+        flagCell.style.textAlign = 'center';
 
-        const li = createElement('li', { textContent: getCityDisplayName(city) });
-        li.style.listStyleType = 'none';
-        li.style.padding = '0';
-        li.style.margin = '0';
+        // UTC Offset Cell
+        const utcCell = createElement('td', { textContent: getTimezoneOffsetString(city.timezone) });
+        utcCell.style.padding = '8px';
+        utcCell.style.borderBottom = '1px solid #ddd';
+        utcCell.style.textAlign = 'center';
+
+        // Remove Button Cell
+        const removeCell = createElement('td');
+        removeCell.style.padding = '8px';
+        removeCell.style.borderBottom = '1px solid #ddd';
+        removeCell.style.textAlign = 'center';
 
         const removeBtn = createElement('button', { textContent: 'Remove' });
         removeBtn.addEventListener('click', () => removeCity(city));
+        removeCell.appendChild(removeBtn);
 
-        li.appendChild(removeBtn);
-        cityCell.appendChild(li);
-
-        row.appendChild(numberCell);
-        row.appendChild(cityCell);
+        row.appendChild(cityNameCell);
+        row.appendChild(flagCell);
+        row.appendChild(utcCell);
+        row.appendChild(removeCell);
         tbody.appendChild(row);
     });
 
@@ -261,6 +288,21 @@ function updateSelectedCitiesUI(): void {
     state.selectedCities.forEach((city, index) => {
         addCityMarker(city, index);
     });
+}
+
+function getTimezoneOffsetString(timezone: string): string {
+    const now = DateTime.now().setZone(timezone);
+    const offsetMinutes = now.offset;
+    const offsetHours = Math.floor(Math.abs(offsetMinutes) / 60);
+    const remainingMinutes = Math.abs(offsetMinutes) % 60;
+    const sign = offsetMinutes >= 0 ? '+' : '-';
+
+    let offsetString = `${sign}${offsetHours}`;
+    if (remainingMinutes > 0) {
+        offsetString += `:${remainingMinutes.toString().padStart(2, '0')}`;
+    }
+
+    return offsetString;
 }
 
 function clearSearch(): void {
