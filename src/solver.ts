@@ -207,7 +207,7 @@ function setupSolveButton(
 
                 solve.on('solution', (solution: any) => {
                     const routeString = parseSolution(solution, modelData, state.selectedCities, speedMatrix);
-                    outputDiv.innerHTML += `<p>Route: <br>${routeString}</p>`;
+                    outputDiv.innerHTML += routeString;
                 });
 
                 return solve;
