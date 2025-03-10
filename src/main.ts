@@ -719,9 +719,6 @@ function setupSearchUI(): void {
     }
 }
 
-function parseNumericInput(value: string): number {
-    return parseInt(value, 10) || 0;
-}
 
 function updateColorScale(min: number, max: number): void {
     const labelsContainer = document.querySelector('.color-scale-labels') as HTMLElement;
