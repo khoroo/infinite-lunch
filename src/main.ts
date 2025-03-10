@@ -212,6 +212,51 @@ function selectCity(city: City): void {
     clearSearch();
 }
 
+// Function to get a color from a viridis-like colormap
+function getViridisColor(value: number): string {
+    // Ensure value is between 0 and 1
+    value = Math.max(0, Math.min(1, value));
+    
+    // Define control points for plasma colormap (simplified version)
+    const colors = [
+        [13, 8, 135],     // Dark purple
+        [85, 0, 170],     // Violet
+        [156, 23, 158],   // Magenta
+        [205, 62, 78],    // Red
+        [246, 147, 34],   // Orange
+        [252, 225, 56]    // Yellow
+    ];
+    
+    // Calculate the position between control points
+    const numColors = colors.length - 1;
+    const idx = value * numColors;
+    const idx1 = Math.floor(idx);
+    const idx2 = Math.min(idx1 + 1, numColors);
+    const fract = idx - idx1;
+    
+    // Linearly interpolate between the colors
+    const r = Math.round(colors[idx1][0] + fract * (colors[idx2][0] - colors[idx1][0]));
+    const g = Math.round(colors[idx1][1] + fract * (colors[idx2][1] - colors[idx1][1]));
+    const b = Math.round(colors[idx1][2] + fract * (colors[idx2][2] - colors[idx1][2]));
+    
+    return `rgb(${r}, ${g}, ${b})`;
+}
+
+// Calculate the distance between two cities in kilometers
+function calculateDistance(city1: City, city2: City): number {
+    const R = 6371; // Earth radius in kilometers
+    const dLat = (city2.latitude - city1.latitude) * Math.PI / 180;
+    const dLon = (city2.longitude - city1.longitude) * Math.PI / 180;
+    
+    const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(city1.latitude * Math.PI / 180) * Math.cos(city2.latitude * Math.PI / 180) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+    
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
 function isCitySelected(city: City): boolean {
     return state.selectedCities.some(
         c => c.name === city.name && c.country_code === city.country_code
@@ -510,6 +555,20 @@ function setupMap(): void {
 // Great Circle Arc Functions
 function drawGreatCircleArc(from: City, to: City): Feature {
     try {
+        // Calculate distance between cities
+        const distance = calculateDistance(from, to);
+        
+        // Normalize distance based on speedMin and speedMax
+        // If speedMin and speedMax are the same, use 0.5 as default normalized value
+        let normalizedValue = 0.5;
+        if (state.speedMax !== state.speedMin) {
+            normalizedValue = (distance - state.speedMin) / (state.speedMax - state.speedMin);
+            normalizedValue = Math.max(0, Math.min(1, normalizedValue)); // Clamp between 0 and 1
+        }
+        
+        // Get color from viridis colormap
+        const arcColor = getViridisColor(normalizedValue);
+        
         // Create an arc circle between the two locations using arc.js
         const arcGenerator = new arcjs.GreatCircle(
             { x: from.longitude, y: from.latitude },
@@ -528,10 +587,10 @@ function drawGreatCircleArc(from: City, to: City): Feature {
                 geometry: new LineString(lineCoords)
             });
             
-            // Style the line with a more visible appearance
+            // Style the line with the calculated color
             lineFeature.setStyle(new Style({
                 stroke: new Stroke({
-                    color: '#3388ff',  // Blue color
+                    color: arcColor,
                     width: 3
                 })
             }));
@@ -541,7 +600,7 @@ function drawGreatCircleArc(from: City, to: City): Feature {
             features.push(lineFeature);
         });
         
-        console.log("Arc drawn:", from.name, "to", to.name);
+        console.log("Arc drawn:", from.name, "to", to.name, "Distance:", distance, "Color:", arcColor);
         
         // Return the first feature as a representative (for compatibility with existing code)
         return features[0] || new Feature();
