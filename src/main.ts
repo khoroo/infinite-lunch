@@ -4,6 +4,12 @@ import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
 import Fuse, { FuseResult } from 'fuse.js'
 import { setupSolveButton } from './solver.ts';
+import Feature from 'ol/Feature';
+import Point from 'ol/geom/Point';
+import VectorSource from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
+import { Circle, Style, Fill, Stroke, Text } from 'ol/style';
+import { fromLonLat } from 'ol/proj';
 
 // Types
 export interface City {
@@ -135,6 +141,39 @@ function updateSelectedResult(items: NodeListOf<Element>, index: number): void {
     items[index].scrollIntoView({ block: 'nearest' });
 }
 
+// Map Related
+let vectorSource: VectorSource;
+let vectorLayer: VectorLayer;
+let map: OLMap;
+
+function addCityMarker(city: City, index: number): void {
+    const iconStyle = new Style({
+        image: new Circle({
+            radius: 14,
+            fill: new Fill({ color: 'rgba(0, 153, 255, 0.6)' }),
+            stroke: new Stroke({ color: '#fff', width: 2 }),
+        }),
+        text: new Text({
+            text: String(index + 1),
+            fill: new Fill({ color: '#fff' }),
+            font: '12px sans-serif',
+            textAlign: 'center',
+            textBaseline: 'middle',
+        }),
+    });
+
+    const cityFeature = new Feature({
+        geometry: new Point(fromLonLat([city.longitude, city.latitude])),
+    });
+
+    cityFeature.setStyle(iconStyle);
+    vectorSource.addFeature(cityFeature);
+}
+
+function clearCityMarkers(): void {
+    vectorSource.clear();
+}
+
 // Selected Cities Management
 function selectCity(city: City): void {
     if (!isCitySelected(city)) {
@@ -163,19 +202,66 @@ function updateSelectedCitiesUI(): void {
     const container = getElement<HTMLElement>('.selected-cities');
     container.innerHTML = '<h3>Selected Cities:</h3>';
 
-    const ul = createElement('ul');
+    const table = createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
 
-    state.selectedCities.forEach(city => {
+    const thead = createElement('thead');
+    const headerRow = createElement('tr');
+
+    const numberHeader = createElement('th', { textContent: '#' });
+    numberHeader.style.padding = '8px';
+    numberHeader.style.borderBottom = '1px solid #ddd';
+    numberHeader.style.textAlign = 'left';
+
+    const cityHeader = createElement('th', { textContent: 'City' });
+    cityHeader.style.padding = '8px';
+    cityHeader.style.borderBottom = '1px solid #ddd';
+    cityHeader.style.textAlign = 'left';
+
+    headerRow.appendChild(numberHeader);
+    headerRow.appendChild(cityHeader);
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    const tbody = createElement('tbody');
+
+    state.selectedCities.forEach((city, index) => {
+        const row = createElement('tr');
+
+        const numberCell = createElement('td', { textContent: String(index + 1) });
+        numberCell.style.padding = '8px';
+        numberCell.style.borderBottom = '1px solid #ddd';
+        numberCell.style.textAlign = 'center';
+
+        const cityCell = createElement('td');
+        cityCell.style.padding = '8px';
+        cityCell.style.borderBottom = '1px solid #ddd';
+
         const li = createElement('li', { textContent: getCityDisplayName(city) });
+        li.style.listStyleType = 'none';
+        li.style.padding = '0';
+        li.style.margin = '0';
 
         const removeBtn = createElement('button', { textContent: 'Remove' });
         removeBtn.addEventListener('click', () => removeCity(city));
 
         li.appendChild(removeBtn);
-        ul.appendChild(li);
+        cityCell.appendChild(li);
+
+        row.appendChild(numberCell);
+        row.appendChild(cityCell);
+        tbody.appendChild(row);
     });
 
-    container.appendChild(ul);
+    table.appendChild(tbody);
+    container.appendChild(table);
+
+    // Update map markers
+    clearCityMarkers();
+    state.selectedCities.forEach((city, index) => {
+        addCityMarker(city, index);
+    });
 }
 
 function clearSearch(): void {
@@ -325,12 +411,21 @@ function setupPresetButtons(): void {
 // Map Setup
 function setupMap(): void {
     try {
-        new OLMap({
+        vectorSource = new VectorSource({
+            features: [], // Add initial features if needed
+        });
+
+        vectorLayer = new VectorLayer({
+            source: vectorSource,
+        });
+
+        map = new OLMap({
             target: 'map',
             layers: [
                 new TileLayer({
                     source: new OSM(),
                 }),
+                vectorLayer, // Add the vector layer to the map
             ],
             view: new View({
                 center: [0, 0],
