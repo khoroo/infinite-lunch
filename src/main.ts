@@ -796,9 +796,9 @@ function setupvelocityPresets(): void {
     const velocityMinInput = getElement<HTMLInputElement>('#velocityMin');
     const velocityMaxInput = getElement<HTMLInputElement>('#velocityMax');
     
-    // Initialize state with default values (Commercial)
-    state.velocityMin = presets.commercial.min;
-    state.velocityMax = presets.commercial.max;
+    // Initialize state with extreme values (changed from commercial)
+    state.velocityMin = presets.extreme.min;
+    state.velocityMax = presets.extreme.max;
     
     // Set up radio button listeners
     document.querySelectorAll('input[name="velocityPreset"]').forEach((radio) => {
