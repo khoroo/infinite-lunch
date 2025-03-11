@@ -71,6 +71,7 @@ const state = {
     fuse: null as Fuse<City> | null,
     selectedCities: [] as City[],
     selectedSearchIndex: 0,
+    selectedRouteIndex: 0, // New state to track selected route
     velocityMin: 0,
     velocityMax: 0,
     currentArcs: [] as Feature[]
@@ -379,6 +380,74 @@ function setupKeyboardNavigation(searchInput: HTMLInputElement): void {
                 break;
         }
     });
+}
+
+// Add this new function to handle keyboard navigation for routes
+function setupRouteKeyboardNavigation(): void {
+    document.addEventListener('keydown', (event: KeyboardEvent) => {
+        // Only handle keyboard navigation when search results are not visible
+        const searchResults = document.querySelector('.search-results');
+        if (searchResults && searchResults.innerHTML.trim() !== '') return;
+        
+        const routeContainers = document.querySelectorAll('.solution-container');
+        const routeCount = routeContainers.length;
+        
+        if (routeCount === 0) return;
+        
+        switch (event.key) {
+            case 'ArrowDown':
+                event.preventDefault();
+                state.selectedRouteIndex = (state.selectedRouteIndex + 1) % routeCount;
+                updateSelectedRoute(routeContainers, state.selectedRouteIndex);
+                break;
+                
+            case 'ArrowUp':
+                event.preventDefault();
+                state.selectedRouteIndex = (state.selectedRouteIndex - 1 + routeCount) % routeCount;
+                updateSelectedRoute(routeContainers, state.selectedRouteIndex);
+                break;
+                
+            case 'Enter':
+                event.preventDefault();
+                if (routeCount > 0) {
+                    const currentRoute = routeContainers[state.selectedRouteIndex] as HTMLElement;
+                    toggleRouteSelection(currentRoute);
+                }
+                break;
+        }
+    });
+}
+
+function updateSelectedRoute(items: NodeListOf<Element>, index: number): void {
+    // First remove all visual focus
+    items.forEach(item => {
+        item.classList.remove('keyboard-focus');
+    });
+    
+    // Add visual focus to the selected route (without toggling selection)
+    const selectedItem = items[index] as HTMLElement;
+    selectedItem.classList.add('keyboard-focus');
+    selectedItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+function toggleRouteSelection(routeElement: HTMLElement): void {
+    // Remove selected from all other routes
+    document.querySelectorAll('.solution-container').forEach(container => {
+        if (container !== routeElement) container.classList.remove('selected');
+    });
+
+    // Toggle selected class on current route
+    routeElement.classList.toggle('selected');
+
+    // Dispatch the same custom event as when clicking
+    const solutionClickEvent = new CustomEvent('solution-click', {
+        detail: {
+            html: routeElement.innerHTML,
+            target: routeElement,
+            isSelected: routeElement.classList.contains('selected')
+        }
+    });
+    document.dispatchEvent(solutionClickEvent);
 }
 
 // --- UI Updates ---
@@ -716,7 +785,9 @@ function setupSolveButton(
             .then(result => {
                 routeContainer.innerHTML += `<p>Status: ${result.status}</p>`;
                 const solutionContainers = routeContainer.querySelectorAll('.solution-container');
-                solutionContainers.forEach(container => {
+                state.selectedRouteIndex = 0; // Reset route index whenever new solutions are shown
+                
+                solutionContainers.forEach((container, index) => {
                     container.addEventListener('click', (event) => {
                         document.querySelectorAll('.solution-container').forEach(c => {
                             if (c !== container) c.classList.remove('selected');
@@ -724,7 +795,10 @@ function setupSolveButton(
 
                         const target = event.currentTarget as HTMLElement;
                         target.classList.toggle('selected');
-
+                        
+                        // Update selected route index when clicked
+                        state.selectedRouteIndex = index;
+                        
                         const solutionClickEvent = new CustomEvent('solution-click', {
                             detail: {
                                 html: target.innerHTML,
@@ -734,6 +808,11 @@ function setupSolveButton(
                         });
                         document.dispatchEvent(solutionClickEvent);
                     });
+                    
+                    // Add visual indicator for keyboard focus on first route
+                    if (index === 0) {
+                        container.classList.add('keyboard-focus');
+                    }
                 });
             })
             .catch(error => {
@@ -985,6 +1064,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupSearchUI();
     setupvelocityPresets(); // Replace setupvelocityMinInput, setupvelocityMaxInput, and setupPresetButtons
     setupMap();
+    setupRouteKeyboardNavigation(); // Add this new function call
     
     // Initialize color scale with default values
     updateColorScale(state.velocityMin, state.velocityMax);

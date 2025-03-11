@@ -303,6 +303,12 @@ table {
   padding-bottom: var(--table-padding-y);
 }
 
+/* Style for keyboard focus on routes (distinct from selection) */
+.solution-container.keyboard-focus {
+  border: 2px solid #0078d7;
+  outline: none;
+}
+
 .solution-container:hover {
   border-color: #aaa;
   box-shadow: 0 0 5px rgba(0,0,0,0.1);
