@@ -222,12 +222,13 @@ table td {
 }
 
 .clock {
-  position: relative;
-  width: 200px;
-  height: 200px;
-  background-color: white;
-  border: 8px solid black;
+  --clock-size: 160px;
+  width: var(--clock-size);
+  height: var(--clock-size);
+  border: 6px solid black; /* Reduced from 8px */
   border-radius: 50%;
+  position: relative;
+  background-color: white;
 }
 
 .hour-marker {
@@ -262,20 +263,20 @@ table td {
 
 .hour-hand {
   width: 8px;
-  height: 60px;
+  height: calc(var(--clock-size) * 0.3); /* Parametric length */
   background-color: black;
   z-index: 5; /* Higher z-index makes it appear on top of everything */
 }
 
 .minute-hand {
   width: 6px;
-  height: 85px;
+  height: calc(var(--clock-size) * 0.42); /* Parametric length */
   background-color: black;
 }
 
 .second-hand {
   width: 2px;
-  height: 90px;
+  height: calc(var(--clock-size) * 0.45); /* Parametric length */
   background-color: red;
   animation: rotate 60s linear infinite;
 }
