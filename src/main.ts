@@ -502,6 +502,49 @@ function parseSolution(solution: any, modelData: ModelData, cities: City[], velo
     return `<div class="solution-container">${resultHtml}</div>`;
 }
 
+// Add this new function to convert solver status to user-friendly message with styling
+function formatSolverStatus(status: string): string {
+    const statusMessages: Record<string, { message: string, className: string }> = {
+        'OPTIMAL_SOLUTION': { 
+            message: 'Optimal solution found', 
+            className: 'status-success' 
+        },
+        'SATISFIED': { 
+            message: 'Solution found', 
+            className: 'status-success' 
+        },
+        'UNSATISFIABLE': { 
+            message: 'No solution exists with current constraints', 
+            className: 'status-error' 
+        },
+        'UNKNOWN': { 
+            message: 'Could not determine if a solution exists', 
+            className: 'status-warning' 
+        },
+        'ERROR': { 
+            message: 'An error occurred while solving', 
+            className: 'status-error' 
+        },
+        'UNBOUNDED': { 
+            message: 'Problem is unbounded', 
+            className: 'status-warning' 
+        },
+        'UNSAT_OR_UNBOUNDED': { 
+            message: 'Problem is unsatisfiable or unbounded', 
+            className: 'status-warning' 
+        }
+    };
+
+    const defaultStatus = { 
+        message: `Solver status: ${status}`, 
+        className: 'status-info' 
+    };
+    
+    const result = statusMessages[status] || defaultStatus;
+    
+    return `<div class="solver-status ${result.className}">${result.message}</div>`;
+}
+
 // --- Setup Solve Button Function ---
 function setupSolveButton(
     state: any
@@ -592,7 +635,7 @@ function setupSolveButton(
                 return solve;
             })
             .then(result => {
-                routeContainer.innerHTML += `<p>Status: ${result.status}</p>`;
+                routeContainer.innerHTML += formatSolverStatus(result.status);
                 const solutionContainers = routeContainer.querySelectorAll('.solution-container');
                 state.selectedRouteIndex = 0; // Reset route index whenever new solutions are shown
 
