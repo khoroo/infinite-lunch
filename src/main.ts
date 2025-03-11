@@ -71,8 +71,8 @@ const state = {
     fuse: null as Fuse<City> | null,
     selectedCities: [] as City[],
     selectedSearchIndex: 0,
-    speedMin: 0,
-    speedMax: 0,
+    velocityMin: 0,
+    velocityMax: 0,
     currentArcs: [] as Feature[]
 };
 
@@ -103,6 +103,12 @@ function setupMap(): void {
                 zoom: 2,
             }),
         });
+
+        // Ensure map container fits narrow screens
+        const mapEl = document.getElementById('map');
+        if (mapEl) {
+            mapEl.style.maxWidth = '100%';
+        }
     } catch (error) {
         console.error("Failed to set up map:", error);
     }
@@ -144,8 +150,8 @@ function drawGreatCircleArc(from: City, to: City): Feature {
         const distance = calculateDistanceGeodesy(from, to);
 
         let normalizedValue = 0.5;
-        if (state.speedMax !== state.speedMin) {
-            normalizedValue = (distance - state.speedMin) / (state.speedMax - state.speedMin);
+        if (state.velocityMax !== state.velocityMin) {
+            normalizedValue = (distance - state.velocityMin) / (state.velocityMax - state.velocityMin);
             normalizedValue = Math.max(0, Math.min(1, normalizedValue));
         }
 
@@ -479,7 +485,7 @@ const calculateDurationMatrix = (timeMatrix: number[][], timeDelta: number): num
         })
     );
 
-const calculateSpeedMatrix = (distanceMatrix: number[][], durationMatrix: number[][]): number[][] =>
+const calculatevelocityMatrix = (distanceMatrix: number[][], durationMatrix: number[][]): number[][] =>
     distanceMatrix.map((distRow, i) =>
         distRow.map((distance, j) => {
             if (i === j) return 0;
@@ -493,20 +499,20 @@ const calculateDistanceGeodesy = (city1: City, city2: City): number =>
 
 // --- Model Data Creation ---
 function createModelData(
-    speedMatrix: number[][],
+    velocityMatrix: number[][],
     durationMatrix: number[][],
-    speedMin: number,
-    speedMax: number
+    velocityMin: number,
+    velocityMax: number
 ): ModelData {
     const edges: [number, number][] = [];
     const costs: number[] = [];
-    const n = speedMatrix.length;
+    const n = velocityMatrix.length;
 
     for (let i = 0; i < n; i++) {
         for (let j = 0; j < n; j++) {
             if (i === j) continue;
-            const velocity = speedMatrix[i][j];
-            if (velocity >= speedMin && velocity <= speedMax) {
+            const velocity = velocityMatrix[i][j];
+            if (velocity >= velocityMin && velocity <= velocityMax) {
                 edges.push([i + 1, j + 1]);
                 costs.push(velocity > 0 ? Math.round(durationMatrix[i][j]) : 0);
             }
@@ -561,7 +567,7 @@ function generateRouteHtml(route: RouteLeg[]): string {
     `;
 }
 
-function parseSolution(solution: any, modelData: ModelData, cities: City[], speedMatrix: number[][]): string {
+function parseSolution(solution: any, modelData: ModelData, cities: City[], velocityMatrix: number[][]): string {
     const { x } = solution.output.json;
     const edges = modelData.E;
     const costs = modelData.c;
@@ -585,7 +591,7 @@ function parseSolution(solution: any, modelData: ModelData, cities: City[], spee
             const remainingMinutes = durationMinutes % 60;
             const durationString = `${durationHours}hrs ${remainingMinutes}mins`;
 
-            const velocity = speedMatrix[currentCityIndex][nextCityIndex];
+            const velocity = velocityMatrix[currentCityIndex][nextCityIndex];
 
             route.push({ from: cities[currentCityIndex].name, to: cities[nextCityIndex].name, duration: durationString, velocity: velocity });
             currentCityIndex = nextCityIndex;
@@ -647,8 +653,8 @@ function setupSolveButton(
         const timeDelta = leftTime - rightTime;
 
         const durationMatrix = calculateDurationMatrix(timeMatrix, timeDelta);
-        const speedMatrix = calculateSpeedMatrix(distanceMatrix, durationMatrix);
-        const modelData = createModelData(speedMatrix, durationMatrix, state.speedMin, state.speedMax);
+        const velocityMatrix = calculatevelocityMatrix(distanceMatrix, durationMatrix);
+        const modelData = createModelData(velocityMatrix, durationMatrix, state.velocityMin, state.velocityMax);
 
         const model = new Model();
         fetch('./tsp.mzn')
@@ -674,7 +680,7 @@ function setupSolveButton(
                         solution,
                         modelData,
                         state.selectedCities,
-                        speedMatrix
+                        velocityMatrix
                     );
                     routeContainer.innerHTML += routeString;
                 });
@@ -761,59 +767,59 @@ const presets = {
   custom: { min: 13, max: 7200 }
 };
 
-function setupSpeedPresets(): void {
+function setupvelocityPresets(): void {
   try {
-    const speedMinInput = getElement<HTMLInputElement>('#speedMin');
-    const speedMaxInput = getElement<HTMLInputElement>('#speedMax');
+    const velocityMinInput = getElement<HTMLInputElement>('#velocityMin');
+    const velocityMaxInput = getElement<HTMLInputElement>('#velocityMax');
     
     // Initialize state with default values (Commercial)
-    state.speedMin = presets.commercial.min;
-    state.speedMax = presets.commercial.max;
+    state.velocityMin = presets.commercial.min;
+    state.velocityMax = presets.commercial.max;
     
     // Set up radio button listeners
-    document.querySelectorAll('input[name="speedPreset"]').forEach((radio) => {
+    document.querySelectorAll('input[name="velocityPreset"]').forEach((radio) => {
       radio.addEventListener('change', (event) => {
         const presetType = (event.target as HTMLInputElement).value;
         const preset = presets[presetType as keyof typeof presets];
         
         if (presetType === 'custom') {
           // Enable custom inputs
-          speedMinInput.disabled = false;
-          speedMaxInput.disabled = false;
+          velocityMinInput.disabled = false;
+          velocityMaxInput.disabled = false;
           
           // Use existing values or default
-          state.speedMin = parseInt(speedMinInput.value) || preset.min;
-          state.speedMax = parseInt(speedMaxInput.value) || preset.max;
+          state.velocityMin = parseInt(velocityMinInput.value) || preset.min;
+          state.velocityMax = parseInt(velocityMaxInput.value) || preset.max;
         } else {
           // Disable custom inputs for fixed presets
-          speedMinInput.disabled = true;
-          speedMaxInput.disabled = true;
+          velocityMinInput.disabled = true;
+          velocityMaxInput.disabled = true;
           
           // Set to preset values
-          state.speedMin = preset.min;
-          state.speedMax = preset.max;
+          state.velocityMin = preset.min;
+          state.velocityMax = preset.max;
           
           // Update input fields to show the preset values
-          speedMinInput.value = preset.min.toString();
-          speedMaxInput.value = preset.max.toString();
+          velocityMinInput.value = preset.min.toString();
+          velocityMaxInput.value = preset.max.toString();
         }
         
-        updateColorScale(state.speedMin, state.speedMax);
+        updateColorScale(state.velocityMin, state.velocityMax);
       });
     });
     
     // Add listeners for custom input changes
-    speedMinInput.addEventListener('change', (event) => {
-      if (!speedMinInput.disabled) {
-        state.speedMin = parseInt((event.target as HTMLInputElement).value);
-        updateColorScale(state.speedMin, state.speedMax);
+    velocityMinInput.addEventListener('change', (event) => {
+      if (!velocityMinInput.disabled) {
+        state.velocityMin = parseInt((event.target as HTMLInputElement).value);
+        updateColorScale(state.velocityMin, state.velocityMax);
       }
     });
     
-    speedMaxInput.addEventListener('change', (event) => {
-      if (!speedMaxInput.disabled) {
-        state.speedMax = parseInt((event.target as HTMLInputElement).value);
-        updateColorScale(state.speedMin, state.speedMax);
+    velocityMaxInput.addEventListener('change', (event) => {
+      if (!velocityMaxInput.disabled) {
+        state.velocityMax = parseInt((event.target as HTMLInputElement).value);
+        updateColorScale(state.velocityMin, state.velocityMax);
       }
     });
     
@@ -952,11 +958,11 @@ document.addEventListener('DOMContentLoaded', () => {
     initialize();
     setupSolveButton(state);
     setupSearchUI();
-    setupSpeedPresets(); // Replace setupSpeedMinInput, setupSpeedMaxInput, and setupPresetButtons
+    setupvelocityPresets(); // Replace setupvelocityMinInput, setupvelocityMaxInput, and setupPresetButtons
     setupMap();
     
     // Initialize color scale with default values
-    updateColorScale(state.speedMin, state.speedMax);
+    updateColorScale(state.velocityMin, state.velocityMax);
 
     document.addEventListener('solution-click', (event: Event) => {
         const customEvent = event as CustomEvent;

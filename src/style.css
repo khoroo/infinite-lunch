@@ -1,73 +1,121 @@
 @import "/node_modules/ol/ol.css";
 
-html,
-body {
-  margin: 0;
+:root {
+  --main-max-width: min(1200px, 95%);
+  --clock-size: clamp(120px, 30vw, 200px);
+  --mobile-breakpoint: 768px;
+  --narrow-breakpoint: 400px;
+  --ultra-narrow-breakpoint: 300px;
+  --color-primary: #4CAF50;
+  --color-primary-hover: #45a049;
+  --color-border: #ddd;
+  --color-hover: #f1f1f1;
+  --color-selected: #f0f0f0;
+  --color-text: #333;
+  --color-background: white;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+}
+
+/* Reset and base styles */
+html {
+  box-sizing: border-box;
+  scroll-behavior: smooth;
   height: 100%;
 }
 
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
 body {
-  font-family: sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 50px;
-  max-width: 1200px;
-  min-height: 100vh;
+  padding: var(--spacing-md);
+  padding-bottom: 3rem;
+  width: 100%;
+  overflow-x: hidden;
+  max-width: var(--main-max-width);
   margin: 0 auto;
-  padding: 20px;
-  padding-bottom: 50px;
 }
 
-/* Adjust container width for desktop, use auto margins */
-body {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+/* Main content container */
+.main-content {
+  width: 100%;
+  max-width: var(--main-max-width);
   display: flex;
   flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Interactive elements */
+button {
+  touch-action: manipulation;
+  cursor: pointer;
 }
 
 #solveButton {
-  padding: 10px 20px;
-  background-color: #4CAF50;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: var(--color-primary);
+  color: white;
   border: none;
-  cursor: pointer;
-  font-size: 16px;
+  border-radius: var(--radius-md);
+  font-size: 1.1rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  width: 80%; /* Make the solve button narrower */
+  max-width: 300px; /* Limit maximum width */
+  margin: 0 auto; /* Center the solve button */
+  display: block; /* Ensure margin auto works correctly */
+}
+
+#solveButton:hover {
+  background-color: var(--color-primary-hover);
 }
 
 #output {
-  margin-top: 20px;
-  font-size: 18px;
-  padding-bottom: 100px;
+  margin-top: var(--spacing-lg);
+  font-size: 1.125rem;
+  width: 100%;
 }
 
-/* Add styles for city search */
+/* City picker styles */
 .city-picker-container {
   width: 100%;
-  max-width: 400px;
-  margin-bottom: 20px;
-  margin-top: 30px; /* Increased top margin for better spacing after solve button */
-  position: relative; /* Add this to make .search-results position relative to this container */
+  max-width: 100%;
+  margin-bottom: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+  position: relative;
 }
 
 .city-search-input {
   width: 100%;
-  padding: 8px;
-  font-size: 16px;
-  margin-bottom: 10px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-sm);
 }
 
 .search-results {
-  border: 1px solid #ccc;
-  max-height: 300px;
+  border: 1px solid var(--color-border);
+  max-height: min(300px, 60vh);
   overflow-y: auto;
-  position: absolute; /* Change to absolute positioning */
-  background: white;
-  margin-bottom: 20px;
-  z-index: 1000; /* Ensure it's on top of other elements */
-  width: 100%; /* Make sure it takes the full width of its parent */
-  left: 0; /* Align to the left edge of the parent */
+  position: absolute;
+  background: var(--color-background);
+  z-index: 1000;
+  width: 100%;
+  left: 0;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .search-results ul {
@@ -77,121 +125,97 @@ body {
 }
 
 .search-results li {
-  padding: 8px 12px;
+  padding: var(--spacing-sm) var(--spacing-md);
   cursor: pointer;
   border-bottom: 1px solid #eee;
 }
 
 .search-results li:hover,
 .search-results li.selected {
-  background-color: #f0f0f0;
+  background-color: var(--color-selected);
 }
 
 .selected-cities li {
-  margin-bottom: 8px;
+  margin-bottom: var(--spacing-sm);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .selected-cities button {
-  margin-left: 10px;
-  padding: 3px 8px;
+  margin-left: var(--spacing-md);
+  padding: 0.25rem var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
 }
 
+/* Table styles */
 table {
   border-collapse: collapse;
+  width: 100%;
 }
 
 table td {
-  border: none;
-  padding: 0 10px;
+  padding: var(--spacing-sm) var(--spacing-md);
 }
 
+/* Map styling */
 #map {
-  width: 800px;
-  height: 600px;
-  margin: 20px auto;
-  flex-shrink: 0; /* Prevent shrinking in a flex container */
-  min-height: 400px;
   width: 100%;
-  margin-top: 20px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  height: clamp(300px, 60vh, 600px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin: var(--spacing-md) 0;
 }
 
+/* Route styling */
 .route-container {
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 10px;
-  margin-top: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  margin-top: var(--spacing-lg);
   width: 100%;
-  max-width: 600px; /* Adjust as needed */
 }
 
 .route-table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 0; /* Remove default margin */
-  margin-top: 10px;
+  margin-bottom: 0;
+  margin-top: var(--spacing-md);
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
 }
 
 .route-table th,
 .route-table td {
-  padding: 8px;
+  padding: var(--spacing-sm);
   text-align: left;
-  border-bottom: 1px solid #eee;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
 }
 
 .route-table th {
   background-color: #f5f5f5;
   font-weight: bold;
-  background-color: #f2f2f2;
 }
 
 .route-table tr:last-child td {
-  border-bottom: none; /* Remove border from the last row */
+  border-bottom: none;
 }
 
 .route-table tr:nth-child(even) {
-  background-color: #f9f9f9; /* Optional: Add alternating row colors */
+  background-color: #f9f9f9;
 }
 
 .route-table tr:hover {
-  background-color: #f1f1f1;
+  background-color: var(--color-hover);
 }
 
-/* Responsive single-column layout for mobile */
-@media (max-width: 768px) {
-  body {
-    width: 100%;
-    padding: 10px;
-  }
-
-  #map {
-    width: 100%;
-    height: 400px;
-    margin: 10px 0;
-  }
-
-  .city-picker-container,
-  table {
-    width: 100%;
-    margin-bottom: 20px;
-  }
-}
-/* Add styles for solution container */
+/* Solution container */
 .solution-container {
-  border: 2px solid transparent;
-  border-radius: 5px;
-  padding: 10px;
-  margin-bottom: 10px;
-  cursor: pointer;
-  margin: 10px 0;
-  border: 2px solid #ddd;
-  border-radius: 5px;
-  padding: 10px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  margin: var(--spacing-sm) 0;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -206,13 +230,13 @@ table td {
   box-shadow: 0 0 8px rgba(0, 119, 204, 0.3);
 }
 
+/* Clock styles */
 .clock-container {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(2, auto);
-  justify-items: center;
-  align-items: center;
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(var(--clock-size), 1fr));
+  gap: var(--spacing-lg);
+  width: 100%;
+  justify-content: center;
 }
 
 .clock-wrapper {
@@ -222,13 +246,12 @@ table td {
 }
 
 .clock {
-  --clock-size: 160px;
+  position: relative;
   width: var(--clock-size);
   height: var(--clock-size);
-  border: 6px solid black; /* Reduced from 8px */
-  border-radius: 50%;
-  position: relative;
   background-color: white;
+  border: 8px solid black;
+  border-radius: 50%;
 }
 
 .hour-marker {
@@ -241,13 +264,12 @@ table td {
 
 .hour-marker div {
   position: absolute;
-  width: 8px;
-  height: 20px;
+  width: clamp(4px, 1vw, 8px);
+  height: clamp(10px, 2.5vw, 20px);
   background-color: black;
-  /* Hour markers set to black */
   left: 50%;
   top: 10px;
-  transform-origin: center 140px;
+  transform-origin: center 75%;
   transform: translateX(-50%);
   pointer-events: none;
 }
@@ -262,21 +284,21 @@ table td {
 }
 
 .hour-hand {
-  width: 8px;
-  height: calc(var(--clock-size) * 0.3); /* Parametric length */
+  width: clamp(4px, 1vw, 8px);
+  height: calc(var(--clock-size) * 0.3);
   background-color: black;
-  z-index: 5; /* Higher z-index makes it appear on top of everything */
+  z-index: 5;
 }
 
 .minute-hand {
-  width: 6px;
-  height: calc(var(--clock-size) * 0.42); /* Parametric length */
+  width: clamp(3px, 0.75vw, 6px);
+  height: calc(var(--clock-size) * 0.425);
   background-color: black;
 }
 
 .second-hand {
-  width: 2px;
-  height: calc(var(--clock-size) * 0.45); /* Parametric length */
+  width: clamp(1px, 0.5vw, 2px);
+  height: calc(var(--clock-size) * 0.45);
   background-color: red;
   animation: rotate 60s linear infinite;
 }
@@ -284,25 +306,25 @@ table td {
 .second-hand::after {
   content: '';
   position: absolute;
-  width: 20px;
-  height: 20px;
+  width: clamp(10px, 2.5vw, 20px);
+  height: clamp(10px, 2.5vw, 20px);
   background-color: red;
   border-radius: 50%;
-  top: -10px;
+  top: calc(-1 * clamp(5px, 1.25vw, 10px));
   left: 50%;
   transform: translateX(-50%);
 }
 
 @keyframes rotate {
   100% {
-      transform: translateX(-50%) rotate(360deg);
+    transform: translateX(-50%) rotate(360deg);
   }
 }
 
 .center-dot {
   position: absolute;
-  width: 12px;
-  height: 12px;
+  width: clamp(6px, 1.5vw, 12px);
+  height: clamp(6px, 1.5vw, 12px);
   background-color: black;
   border-radius: 50%;
   top: 50%;
@@ -312,51 +334,64 @@ table td {
 }
 
 .time-inputs {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 10px; /* Add some space between clock and inputs */
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two columns for HH and MM */
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  width: 100%;
+  max-width: var(--clock-size);
 }
 
 .time-inputs input {
-  width: 50px; /* Adjust input width */
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.time-inputs button {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  grid-column: 1 / span 2; /* Span both columns */
+  text-align: center; /* Center the text */
+  margin: 0 auto; /* Center the button */
+  max-width: 100%; /* Ensure it doesn't exceed the input width */
 }
 
 .time-inputs input[type="number"] {
   -moz-appearance: textfield;
-  appearance: auto; /* Ensure up and down arrows are visible */
+  appearance: auto;
 }
 
 .time-inputs input[type="number"]::-webkit-outer-spin-button,
 .time-inputs input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: auto; /* Ensure up and down arrows are visible */
+  -webkit-appearance: auto;
   margin: 0;
 }
 
 .clock-label {
-  font-size: 1.5em;
+  font-size: 1.25rem;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: var(--spacing-sm);
   text-align: center;
-}
-
-/* We don't need this anymore since we're using clock-label */
-.clock-row {
-  display: none;
 }
 
 /* Color scale styles */
 .color-scale-container {
   width: 100%;
-  max-width: 800px;
-  margin: 15px auto;
+  max-width: 100%;
+  margin: var(--spacing-lg) auto;
 }
 
 .color-scale {
   height: 30px;
   width: 100%;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   background: linear-gradient(to right, 
     rgb(13, 8, 135), 
     rgb(85, 0, 170), 
@@ -370,53 +405,35 @@ table td {
 .color-scale-labels {
   display: flex;
   justify-content: space-between;
-  margin-top: 5px;
-  font-size: 14px;
+  margin-top: var(--spacing-sm);
+  font-size: 0.875rem;
 }
 
 .color-scale-title {
   font-weight: bold;
-  margin-bottom: 5px;
+  margin-bottom: var(--spacing-sm);
   text-align: center;
 }
 
+/* Solve button container */
 .solve-button-container {
   width: 100%;
-  max-width: 400px;
-  margin-bottom: 20px;
-  margin-top: 20px;
+  margin-bottom: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
 }
 
-.solve-button-container button {
-  width: 100%;
-  padding: 12px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
-}
-
-.solve-button-container button:hover {
-  background-color: #45a049;
-}
-
-/* Velocity presets table styles */
+/* Velocity presets table */
 .velocity-presets-table {
   width: 100%;
-  max-width: 600px;
-  margin: 20px auto;
+  margin: var(--spacing-lg) auto;
   border-collapse: collapse;
 }
 
 .velocity-presets-table th,
 .velocity-presets-table td {
-  padding: 10px;
+  padding: 0.75rem;
   text-align: left;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .velocity-presets-table th {
@@ -441,4 +458,346 @@ table td {
 
 .velocity-presets-table tr:hover {
   background-color: #f9f9f9;
+}
+
+/* NEW: Velocity table wrapper to allow horizontal scrolling */
+.velocity-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Responsive adjustments */
+@media (max-width: var(--mobile-breakpoint)) {
+  body {
+    padding: var(--spacing-sm);
+    padding-bottom: 2rem;
+  }
+  
+  .clock-wrapper {
+    margin: var(--spacing-sm) 0;
+  }
+  
+  .clock-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .route-table td,
+  .velocity-presets-table td {
+    padding: var(--spacing-sm);
+  }
+}
+
+/* Very narrow screens */
+@media (max-width: var(--narrow-breakpoint)) {
+  :root {
+    --clock-size: clamp(100px, 40vw, 160px);
+    --spacing-sm: 0.25rem;
+    --spacing-md: 0.5rem;
+    --spacing-lg: 1rem;
+  }
+  
+  body {
+    padding: 0.25rem;
+    padding-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+  
+  #solveButton, 
+  .city-search-input,
+  .time-inputs input,
+  .velocity-presets-table input[type="number"] {
+    padding: 0.4rem;
+    font-size: 0.9rem;
+  }
+  
+  .clock-label {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .selected-cities button {
+    padding: 0.15rem 0.3rem;
+    margin-left: 0.3rem;
+  }
+  
+  table td, 
+  .route-table td,
+  .velocity-presets-table td {
+    padding: 0.25rem;
+  }
+  
+  .time-inputs {
+    gap: 0.25rem;
+  }
+  
+  .search-results {
+    max-height: 50vh;
+  }
+  
+  .solution-container {
+    padding: 0.5rem;
+  }
+  
+  .color-scale {
+    height: 20px;
+  }
+  
+  .color-scale-labels {
+    font-size: 0.7rem;
+  }
+  
+  #output {
+    font-size: 0.9rem;
+  }
+  
+  .velocity-presets-table th,
+  .velocity-presets-table td {
+    padding: 0.25rem;
+    font-size: 0.9rem;
+  }
+  
+  .velocity-presets-table input[type="number"] {
+    width: 60px;
+    padding: 3px;
+  }
+}
+
+/* Ultra-narrow screens (including 21:9 portrait) */
+@media (max-width: var(--ultra-narrow-breakpoint)) {
+  :root {
+    --clock-size: clamp(80px, 60vw, 120px);
+  }
+  
+  body {
+    padding: 0.15rem;
+    font-size: 0.85rem;
+  }
+  
+  #solveButton, 
+  .city-search-input,
+  .time-inputs input,
+  .velocity-presets-table input[type="number"] {
+    padding: 0.3rem;
+    font-size: 0.85rem;
+  }
+  
+  .clock-label {
+    font-size: 0.9rem;
+  }
+  
+  .hour-marker div {
+    width: 3px;
+    height: 8px;
+  }
+  
+  .hour-hand {
+    width: 3px;
+  }
+  
+  .minute-hand {
+    width: 2px;
+  }
+  
+  .second-hand {
+    width: 1px;
+  }
+  
+  .center-dot {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .time-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    width: 100%;
+  }
+  
+  .time-inputs input,
+  .time-inputs button {
+    padding: 0.2rem;
+    font-size: 0.8rem;
+  }
+  
+  .velocity-presets-table {
+    table-layout: fixed;
+    font-size: 0.7rem; /* Even smaller font */
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+  
+  .velocity-presets-table th,
+  .velocity-presets-table td {
+    padding: 0.15rem;
+    word-break: break-word;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .velocity-presets-table th:first-child,
+  .velocity-presets-table td:first-child {
+    width: 8%;
+    min-width: 16px;
+  }
+  
+  .velocity-presets-table th:nth-child(2),
+  .velocity-presets-table td:nth-child(2) {
+    width: 34%;
+  }
+  
+  .velocity-presets-table th:nth-child(3),
+  .velocity-presets-table th:nth-child(4),
+  .velocity-presets-table td:nth-child(3),
+  .velocity-presets-table td:nth-child(4) {
+    width: 29%;
+  }
+  
+  .velocity-presets-table input[type="number"] {
+    width: 100%;
+    max-width: 40px;
+    padding: 0.1rem;
+    font-size: 0.65rem;
+  }
+  
+  /* Ultra-narrow screens: force a minimum table width so it doesn't squeeze too much */
+  .velocity-presets-table {
+    table-layout: fixed;
+    min-width: 300px;
+    font-size: 0.7rem; /* Reduce font size further if needed */
+  }
+  
+  /* For extremely narrow screens */
+  @media (max-width: 260px) {
+    .velocity-presets-table {
+      font-size: 0.6rem;
+    }
+    
+    .velocity-presets-table th,
+    .velocity-presets-table td {
+      padding: 0.1rem;
+    }
+    
+    .velocity-presets-table input[type="number"] {
+      max-width: 30px;
+      padding: 0.05rem;
+    }
+    
+    .velocity-presets-table label {
+      font-size: 0.6rem;
+      line-height: 1;
+    }
+    
+    /* Force shorter text */
+    .velocity-presets-table label[for="commercialPreset"]::after {
+      content: 'Comm.';
+      display: block;
+      font-size: 0.6rem;
+    }
+    
+    .velocity-presets-table label[for="commercialPreset"] {
+      font-size: 0;
+    }
+    
+    .velocity-presets-table label[for="concordePreset"]::after {
+      content: 'Conc.';
+      display: block;
+      font-size: 0.6rem;
+    }
+    
+    .velocity-presets-table label[for="concordePreset"] {
+      font-size: 0;
+    }
+    
+    .velocity-presets-table label[for="extremePreset"]::after {
+      content: 'Extr.';
+      display: block;
+      font-size: 0.6rem;
+    }
+    
+    .velocity-presets-table label[for="extremePreset"] {
+      font-size: 0;
+    }
+    
+    .velocity-presets-table label[for="customPreset"]::after {
+      content: 'Cust.';
+      display: block;
+      font-size: 0.6rem;
+    }
+    
+    .velocity-presets-table label[for="customPreset"] {
+      font-size: 0;
+    }
+  }
+  
+  /* Fixes for odd aspect ratios */
+  @supports (aspect-ratio: 9/21) {
+    body {
+      max-width: 95vw;
+      padding-left: 0.1rem;
+      padding-right: 0.1rem;
+    }
+    
+    .clock-wrapper {
+      transform: scale(0.9);
+      margin-bottom: -0.5rem;
+    }
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: var(--mobile-breakpoint)) and (orientation: landscape) {
+  #map {
+    height: 50vh;
+  }
+  
+  .clock-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-contrast: more) {
+  button {
+    border: 2px solid currentColor;
+  }
+  
+  .solution-container.selected {
+    border-width: 3px;
+  }
+}
+
+/* Animation preferences */
+@media (prefers-reduced-motion: reduce) {
+  .solution-container,
+  #solveButton {
+    transition: none;
+  }
+  
+  .second-hand {
+    animation: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    padding: 0;
+  }
+  
+  #map {
+    height: 500px;
+  }
+  
+  .solution-container {
+    border: 1px solid black;
+    page-break-inside: avoid;
+  }
 }
