@@ -528,10 +528,7 @@ table {
     align-items: center;
   }
 
-  .color-scale-labels {
-    margin-top: 0.25rem;
-    padding-top: 0.25rem;
-  }
+
   .scale-label-text {
     font-size: 12px;
   }
@@ -561,7 +558,7 @@ table {
 // Solve button container
 .solve-button-container {
   width: 100%;
-  margin: var(--spacing-lg) 0;
+  margin: var(--spacing-lg) var(--spacing-lg);
 }
 
 // Velocity presets table
@@ -569,7 +566,7 @@ table {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-sm);
 
   .velocity-presets-table {
     width: 100%;
