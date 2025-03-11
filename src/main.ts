@@ -19,8 +19,9 @@ let state = {
     velocityMax: 0,
     currentArcs: [] as Feature[],
     currentRoute: [] as Array<{ from: string, to: string, velocity: number }>,
-    // Add new property for visitation order
-    visitationOrder: [] as City[]
+    visitationOrder: [] as City[],
+    // Load exampleHintHidden from localStorage or default to false
+    exampleHintHidden: localStorage.getItem('exampleHintHidden') === 'true'
 };
 
 // --- Map Integration Functions ---
@@ -317,6 +318,26 @@ function updateSelectedCitiesUI(): void {
 
     table.appendChild(tbody);
     container.appendChild(table);
+
+    // Hide example hint if all three suggested cities are selected
+    const londonSelected = state.selectedCities.some(city => 
+        city.name.toLowerCase().includes('london'));
+    const newYorkSelected = state.selectedCities.some(city => 
+        city.name.toLowerCase().includes('new york'));
+    const losAngelesSelected = state.selectedCities.some(city => 
+        city.name.toLowerCase().includes('los angeles'));
+    
+    // Set the flag to true if all cities are selected and save to localStorage
+    if (londonSelected && newYorkSelected && losAngelesSelected) {
+        state.exampleHintHidden = true;
+        localStorage.setItem('exampleHintHidden', 'true');
+    }
+    
+    // Use the flag to determine visibility - once hidden, stays hidden
+    const exampleHint = document.querySelector<HTMLElement>('.example-hint');
+    if (exampleHint) {
+        exampleHint.style.display = state.exampleHintHidden ? 'none' : '';
+    }
 
     mapService.clearCityMarkers();
     state.selectedCities.forEach((city, index) => {
@@ -974,6 +995,16 @@ function loadCities(): Promise<City[]> {
         });
 }
 
+// Add this function to hide the hint on initial load if needed
+function checkExampleHintVisibility(): void {
+    if (state.exampleHintHidden) {
+        const exampleHint = document.querySelector<HTMLElement>('.example-hint');
+        if (exampleHint) {
+            exampleHint.style.display = 'none';
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initialize();
     setupSolveButton(state);
@@ -982,6 +1013,7 @@ document.addEventListener('DOMContentLoaded', () => {
     mapService.setupMap();
     setupRouteKeyboardNavigation();
     setupKeyboardShortcuts(); // Add this line to set up keyboard shortcuts
+    checkExampleHintVisibility(); // Add this line to check hint visibility on page load
 
     document.addEventListener('solution-click', (event: Event) => {
         const customEvent = event as CustomEvent;
