@@ -72,6 +72,14 @@ function removeCity(city: City): void {
     }
 }
 
+// Add this function to remove the last selected city
+function removeLastCity(): void {
+    if (state.selectedCities.length > 0) {
+        const lastCity = state.selectedCities[state.selectedCities.length - 1];
+        removeCity(lastCity);
+    }
+}
+
 // --- City Search ---
 function searchCities(query: string): FuseResult<City>[] {
     if (!state.fuse || query.trim().length === 0) return [];
@@ -909,6 +917,34 @@ function initialize(): void {
     });
 }
 
+// --- Keyboard Shortcuts ---
+function setupKeyboardShortcuts(): void {
+    document.addEventListener('keydown', (event: KeyboardEvent) => {
+        // Check for Cmd+Enter (Mac) or Ctrl+Enter (Windows/Linux)
+        if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+            event.preventDefault(); // Prevent default browser behavior
+            
+            const solveButton = document.querySelector<HTMLElement>('#solveButton');
+            if (solveButton) {
+                solveButton.click();
+            }
+        }
+        
+        // Check for Cmd+K (Mac) or Ctrl+K (Windows/Linux) to remove last city
+        if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
+            event.preventDefault(); // Prevent default browser behavior
+            
+            // Don't remove cities when user is focused on search input
+            const activeElement = document.activeElement;
+            if (activeElement && activeElement.tagName === 'INPUT') {
+                return;
+            }
+            
+            removeLastCity();
+        }
+    });
+}
+
 function loadCities(): Promise<City[]> {
     return fetch('./cities.json')
         .then(response => response.json())
@@ -935,6 +971,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupvelocityPresets();
     mapService.setupMap();
     setupRouteKeyboardNavigation();
+    setupKeyboardShortcuts(); // Add this line to set up keyboard shortcuts
 
     document.addEventListener('solution-click', (event: Event) => {
         const customEvent = event as CustomEvent;
