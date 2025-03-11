@@ -15,6 +15,7 @@ import { Model } from 'https://cdn.jsdelivr.net/npm/minizinc/dist/minizinc.mjs';
 import LatLon from 'geodesy/latlon-ellipsoidal-vincenty.js';
 import { DateTime } from 'luxon';
 import './clock';
+import { boundingExtent } from 'ol/extent';
 
 // --- Types ---
 export interface City {
@@ -129,6 +130,8 @@ function addCityMarker(city: City, index: number): void {
 
     cityFeature.setStyle(iconStyle);
     vectorSource.addFeature(cityFeature);
+
+    updateMapView();
 }
 
 function clearCityMarkers(): void {
@@ -267,6 +270,7 @@ function removeCity(city: City): void {
         state.selectedCities.splice(index, 1);
         clearArcs();
         updateSelectedCitiesUI();
+        updateMapView();
     }
 }
 
@@ -931,6 +935,17 @@ function loadCities(): Promise<City[]> {
             console.log(`Loaded ${state.cities.length} cities`);
             return data;
         });
+}
+
+function updateMapView(): void {
+    if (state.selectedCities.length === 0) return;
+
+    const coordinates = state.selectedCities.map(city => fromLonLat([city.longitude, city.latitude]));
+    const extent = boundingExtent(coordinates);
+    const map = vectorLayer.get('map'); // Corrected method to get the map instance
+    if (map) {
+        map.getView().fit(extent, { padding: [50, 50, 50, 50], duration: 1000 });
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
