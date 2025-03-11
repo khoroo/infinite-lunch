@@ -904,3 +904,27 @@ table {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch; /* Improve scrolling on iOS */
 }
+
+/* Add these styles to your existing stylesheet */
+
+/* Ensure that map controls don't interfere with arrow visibility */
+.ol-control {
+  z-index: 10;
+}
+
+/* Enhance route highlighting when selected */
+.solution-container.selected {
+  box-shadow: 0 0 0 2px #0078d4;
+  
+  .route-table {
+    tr:hover {
+      background-color: rgba(0, 120, 212, 0.1);
+    }
+  }
+}
+
+/* Style for route arrows */
+.ol-layer canvas {
+  /* Improve rendering quality for canvas elements containing our arrows */
+  image-rendering: high-quality;
+}

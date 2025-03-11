@@ -7,7 +7,7 @@ import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
-import { Circle, Style, Fill, Stroke, Text } from 'ol/style';
+import { Circle, Style, Fill, Stroke, Text, Icon } from 'ol/style';
 import { fromLonLat } from 'ol/proj';
 import LineString from 'ol/geom/LineString';
 import * as arcjs from 'arc';
@@ -71,10 +71,11 @@ const state = {
     fuse: null as Fuse<City> | null,
     selectedCities: [] as City[],
     selectedSearchIndex: 0,
-    selectedRouteIndex: 0, // New state to track selected route
+   selectedRouteIndex: 0, // New state to track selected route
     velocityMin: 0,
     velocityMax: 0,
-    currentArcs: [] as Feature[]
+    currentArcs: [] as Feature[],
+    currentRoute: [] as Array<{ from: string, to: string, velocity: number }>
 };
 
 // --- Map ---
@@ -159,11 +160,25 @@ function clearCityMarkers(): void {
 // --- Great Circle Arcs ---
 function drawGreatCircleArc(from: City, to: City): Feature {
     try {
-        const distance = calculateDistanceGeodesy(from, to);
+        // Look up the velocity between these cities in the current route
+        const fromCityName = from.name;
+        const toCityName = to.name;
+        
+        // Get velocity from the selected route for this segment
+        let velocity = 0;
+        if (state.currentRoute && state.currentRoute.length > 0) {
+            const segment = state.currentRoute.find(
+                seg => seg.from === fromCityName && seg.to === toCityName
+            );
+            if (segment) {
+                velocity = segment.velocity;
+            }
+        }
 
-        let normalizedValue = 0.5;
+        // Normalize velocity based on route's velocity range
+        let normalizedValue = 0.5; // default mid-point if no range
         if (state.velocityMax !== state.velocityMin) {
-            normalizedValue = (distance - state.velocityMin) / (state.velocityMax - state.velocityMin);
+            normalizedValue = (velocity - state.velocityMin) / (state.velocityMax - state.velocityMin);
             normalizedValue = Math.max(0, Math.min(1, normalizedValue));
         }
 
@@ -183,12 +198,19 @@ function drawGreatCircleArc(from: City, to: City): Feature {
                 geometry: new LineString(lineCoords)
             });
 
-            lineFeature.setStyle(new Style({
+            // Create the main line style
+            const lineStyle = new Style({
                 stroke: new Stroke({
                     color: arcColor,
                     width: 3
                 })
-            }));
+            });
+
+            // Create arrow styles along the line
+            const arrowStyles = createArrowStyles(lineCoords, arcColor);
+
+            // Combine the line style with arrow styles
+            lineFeature.setStyle([lineStyle, ...arrowStyles]);
 
             vectorSource.addFeature(lineFeature);
             features.push(lineFeature);
@@ -205,16 +227,80 @@ function drawGreatCircleArc(from: City, to: City): Feature {
             geometry: new LineString(lineCoordinates)
         });
 
-        lineFeature.setStyle(new Style({
+        // Create the main line style
+        const lineStyle = new Style({
             stroke: new Stroke({
                 color: '#ff0000',
                 width: 3
             })
-        }));
+        });
+
+        // Create arrow styles for error case
+        const arrowStyles = createArrowStyles(lineCoordinates, '#ff0000');
+
+        // Combine the line style with arrow styles
+        lineFeature.setStyle([lineStyle, ...arrowStyles]);
 
         vectorSource.addFeature(lineFeature);
         return lineFeature;
     }
+}
+
+// New helper: generate a data URL for a simple arrow image
+function generateArrowDataUrl(color: string): string {
+    // Create a canvas and draw an arrow shape
+    const canvas = document.createElement('canvas');
+    canvas.width = 20;
+    canvas.height = 20;
+    const ctx = canvas.getContext('2d')!;
+    ctx.translate(10, 10);
+    ctx.rotate(0);
+    ctx.beginPath();
+    ctx.moveTo(10, 0);    // tip
+    ctx.lineTo(-5, -5);   // left corner
+    ctx.lineTo(-2, 0);    // indent
+    ctx.lineTo(-5, 5);    // right corner
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    return canvas.toDataURL();
+}
+
+function createArrowIcon(color: string, rotation: number): Icon {
+    return new Icon({
+        src: generateArrowDataUrl(color),
+        rotation: rotation, // changed from -rotation to rotation so the arrow points in one direction
+        rotateWithView: true,
+        anchor: [0.5, 0.5],
+        scale: 0.5  // adjust as needed
+    });
+}
+
+function createArrowStyles(coordinates: number[][], color: string): Style[] {
+    const styles: Style[] = [];
+    const lineLength = coordinates.length;
+    const numArrows = Math.min(Math.max(Math.floor(lineLength / 25), 3), 6);
+    
+    for (let i = 1; i <= numArrows; i++) {
+        const pointIndex = Math.floor(i * lineLength / (numArrows + 1));
+        if (pointIndex < 1 || pointIndex >= lineLength - 1) continue;
+        
+        const point = coordinates[pointIndex];
+        const prevPoint = coordinates[pointIndex - 1];
+        const dx = point[0] - prevPoint[0];
+        const dy = point[1] - prevPoint[1];
+        const rotation = Math.atan2(dy, dx);
+        
+        const arrowStyle = new Style({
+            geometry: new Point(point),
+            image: createArrowIcon(color, rotation)
+        });
+        styles.push(arrowStyle);
+    }
+    return styles;
 }
 
 function calculateGreatCircleArc(from: City, to: City, numPoints: number = 100): ArcCoordinates[] {
@@ -252,7 +338,7 @@ function clearArcs(): void {
     state.currentArcs = [];
 }
 
-function drawRouteArcs(routeData: Array<{ from: string, to: string }>): void {
+function drawRouteArcs(routeData: Array<{ from: string, to: string, velocity?: number }>): void {
     clearArcs();
 
     routeData.forEach(segment => {
@@ -1000,22 +1086,38 @@ function getViridisColor(value: number): string {
     return `rgb(${r}, ${g}, ${b})`;
 }
 
-function parseRouteFromHtml(htmlContent: string): Array<{ from: string, to: string }> {
-    const route: Array<{ from: string, to: string }> = [];
+function parseRouteFromHtml(htmlContent: string): Array<{ from: string, to: string, velocity: number }> {
+    const route: Array<{ from: string, to: string, velocity: number }> = [];
 
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlContent;
 
     const rows = tempDiv.querySelectorAll('.route-table tr');
+    
+    // Initialize velocity min/max
+    let minVelocity = Number.MAX_VALUE;
+    let maxVelocity = Number.MIN_VALUE;
 
     for (let i = 1; i < rows.length - 1; i++) {
         const cells = rows[i].querySelectorAll('td');
-        if (cells.length >= 2) {
-            route.push({
-                from: cells[0].textContent?.trim() || '',
-                to: cells[1].textContent?.trim() || ''
-            });
+        if (cells.length >= 4) {
+            const from = cells[0].textContent?.trim() || '';
+            const to = cells[1].textContent?.trim() || '';
+            const velocityText = cells[3].textContent?.trim() || '0';
+            const velocity = parseInt(velocityText.replace(/[^\d]/g, ''));
+            
+            // Update min/max velocity
+            if (velocity < minVelocity) minVelocity = velocity;
+            if (velocity > maxVelocity) maxVelocity = velocity;
+            
+            route.push({ from, to, velocity });
         }
+    }
+    
+    // Update state with the route's velocity range
+    if (route.length > 0) {
+        state.velocityMin = minVelocity;
+        state.velocityMax = maxVelocity;
     }
 
     return route;
@@ -1053,7 +1155,7 @@ function updateMapView(): void {
     const coordinates = state.selectedCities.map(city => fromLonLat([city.longitude, city.latitude]));
     const extent = boundingExtent(coordinates);
     const map = vectorLayer.get('map'); // Corrected method to get the map instance
-    if (map) {
+    if (map != null) {  // now checking explicitly
         map.getView().fit(extent, { padding: [50, 50, 50, 50], duration: 1000 });
     }
 }
@@ -1074,10 +1176,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const isSelected = customEvent.detail.isSelected;
 
+        const scaleLabels = document.querySelector('.color-scale-labels');
+        if (scaleLabels) {
+            if (isSelected) {
+                updateColorScale(state.velocityMin, state.velocityMax);
+            } else {
+                scaleLabels.innerHTML = '';
+            }
+        }
+
         if (isSelected) {
             const routeData = parseRouteFromHtml(customEvent.detail.html);
+            
+            // Store the current route in state
+            state.currentRoute = routeData;
+            
+            // Update color scale with the route's velocity range
+            if (scaleLabels) {
+                updateColorScale(state.velocityMin, state.velocityMax);
+            }
+            
+            // Draw the route arcs using the updated velocity range
             drawRouteArcs(routeData);
         } else {
+            // Clear state and UI when no route is selected
+            state.currentRoute = [];
+            if (scaleLabels) {
+                scaleLabels.innerHTML = '';
+            }
             clearArcs();
         }
     });
