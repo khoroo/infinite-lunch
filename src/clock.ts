@@ -57,6 +57,7 @@ function createClockDOM(clockSide: 'left' | 'right'): void {
     
     const ampmToggle = document.createElement('button');
     ampmToggle.id = `ampmToggle-${clockSide}`;
+    ampmToggle.setAttribute('aria-label', 'Toggle AM/PM');
     timeInputs.appendChild(ampmToggle);
     
     clockWrapper.appendChild(clock);
