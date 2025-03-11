@@ -1,7 +1,8 @@
 @import "/node_modules/ol/ol.css";
 
 :root {
-  --main-max-width: min(900px, 95%);  /* Changed from 1200px to 900px */
+  --main-max-width: min(900px, 95%);
+  /* Changed from 1200px to 900px */
   --clock-size: clamp(120px, 30vw, 200px);
   --mobile-breakpoint: 768px;
   --narrow-breakpoint: 400px;
@@ -19,14 +20,17 @@
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
-  --table-padding-x: 0.5rem;  /* New variable for horizontal table padding */
-  --table-padding-y: 0.5rem;  /* New variable for vertical table padding */
+  --table-padding-x: 0.5rem;
+  /* New variable for horizontal table padding */
+  --table-padding-y: 0.5rem;
+  /* New variable for vertical table padding */
 }
 
 /* Add styles for paragraphs to limit width */
 p {
   /* max-width: var(); */
-  margin-left: 0; /* Left align paragraphs instead of centering */
+  margin-left: 0;
+  /* Left align paragraphs instead of centering */
   margin-right: 0;
   line-height: 1.5;
 }
@@ -38,11 +42,14 @@ html {
   height: 100%;
 }
 
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   box-sizing: inherit;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   width: 100%;
@@ -65,7 +72,8 @@ body {
   /* overflow-x: hidden; */
   max-width: var(--main-max-width);
   margin: 0 auto;
-  position: relative; /* Ensure proper stacking context */
+  position: relative;
+  /* Ensure proper stacking context */
 }
 
 /* Main content container */
@@ -92,10 +100,14 @@ button {
   font-size: 1.1rem;
   font-weight: bold;
   transition: background-color 0.3s ease;
-  width: 80%; /* Make the solve button narrower */
-  max-width: 300px; /* Limit maximum width */
-  margin: 0 auto; /* Center the solve button */
-  display: block; /* Ensure margin auto works correctly */
+  width: 80%;
+  /* Make the solve button narrower */
+  max-width: 300px;
+  /* Limit maximum width */
+  margin: 0 auto;
+  /* Center the solve button */
+  display: block;
+  /* Ensure margin auto works correctly */
 }
 
 #solveButton:hover {
@@ -118,13 +130,15 @@ button {
 }
 
 .city-search-input {
-  width: 80%; /* Changed from 100% to 80% to make narrower */
+  width: 80%;
+  /* Changed from 100% to 80% to make narrower */
   padding: 0.75rem;
   font-size: 1rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   margin-bottom: var(--spacing-sm);
-  margin-left: auto; /* Center the narrower input */
+  margin-left: auto;
+  /* Center the narrower input */
   margin-right: auto;
   display: block;
 }
@@ -139,7 +153,7 @@ button {
   width: 100%;
   left: 0;
   border-radius: var(--radius-md);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .search-results ul {
@@ -178,8 +192,9 @@ button {
 table {
   border-collapse: collapse;
   width: 100%;
-  
-  td, th {
+
+  td,
+  th {
     padding: var(--table-padding-y) var(--table-padding-x);
     text-align: left;
   }
@@ -190,7 +205,8 @@ table {
   width: 100%;
   /* Remove the dynamic height as we'll set it programmatically */
   /* height: clamp(300px, 60vh, 600px); */
-  aspect-ratio: 2 / 1; /* Fallback for browsers that support aspect-ratio */
+  aspect-ratio: 2 / 1;
+  /* Fallback for browsers that support aspect-ratio */
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   margin: var(--spacing-md) 0;
@@ -200,11 +216,12 @@ table {
 @supports not (aspect-ratio: 2 / 1) {
   #map {
     height: 0;
-    padding-bottom: 50%; /* 50% of width = 2:1 ratio */
+    padding-bottom: 50%;
+    /* 50% of width = 2:1 ratio */
     position: relative;
   }
-  
-  #map > * {
+
+  #map>* {
     position: absolute;
     top: 0;
     left: 0;
@@ -224,36 +241,39 @@ table {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-bottom: calc(var(--spacing-md) * 1.5); /* Extra padding at bottom to prevent cutoff */
+  padding-bottom: calc(var(--spacing-md) * 1.5);
+  /* Extra padding at bottom to prevent cutoff */
 }
 
 .route-table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: var(--spacing-sm); /* Add bottom margin to prevent cutoff */
+  margin-bottom: var(--spacing-sm);
+  /* Add bottom margin to prevent cutoff */
   margin-top: var(--spacing-md);
   font-size: clamp(0.875rem, 2.5vw, 1rem);
-  
-  th, td {
+
+  th,
+  td {
     padding: var(--table-padding-y) var(--table-padding-x);
     text-align: left;
     border: 1px solid var(--color-border);
   }
-  
+
   th {
     background-color: #f5f5f5;
     font-weight: bold;
   }
-  
+
   tr {
     &:last-child td {
       border-bottom: none;
     }
-    
+
     &:nth-child(even) {
       background-color: #f9f9f9;
     }
-    
+
     &:hover {
       background-color: var(--color-hover);
     }
@@ -264,32 +284,39 @@ table {
 .solution-container {
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: var(--spacing-md); /* Use consistent padding on all sides */
+  padding: var(--spacing-md);
+  /* Use consistent padding on all sides */
   margin: var(--spacing-sm) 0;
   cursor: pointer;
   transition: all 0.3s ease;
-  overflow: hidden; /* Prevent table from extending beyond container */
-  display: flex; /* Use flex to contain the table */
+  overflow: hidden;
+  /* Prevent table from extending beyond container */
+  display: flex;
+  /* Use flex to contain the table */
   flex-direction: column;
-  align-items: stretch; /* Make child elements (table) fill the width */
-  
+  align-items: stretch;
+  /* Make child elements (table) fill the width */
+
   /* Make the table take up the full width of the container with consistent margins */
   .route-table,
   .route-table-wrapper table {
     width: 100%;
-    margin: var(--spacing-sm) 0; /* Consistent margins top and bottom */
+    margin: var(--spacing-sm) 0;
+    /* Consistent margins top and bottom */
   }
-  
+
   /* Fix for last table row */
   .route-table tr:last-child td,
   .route-table-wrapper table tr:last-child td {
-    border-bottom: 1px solid var(--color-border); /* Ensure bottom border is visible */
-    padding-bottom: var(--table-padding-y); /* Ensure consistent padding */
+    border-bottom: 1px solid var(--color-border);
+    /* Ensure bottom border is visible */
+    padding-bottom: var(--table-padding-y);
+    /* Ensure consistent padding */
   }
 }
 
 /* Additional rule to ensure table rows have consistent padding in all directions */
-.route-table td, 
+.route-table td,
 .route-table th,
 .route-table-wrapper table td,
 .route-table-wrapper table th {
@@ -311,14 +338,15 @@ table {
 
 .solution-container:hover {
   border-color: #aaa;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .solution-container.selected {
   border: 2px dashed black;
   box-shadow: 0 0 8px rgba(0, 119, 204, 0.3);
-  background-color: rgba(240, 248, 255, 0.3); /* Light highlight background */
-  
+  background-color: rgba(240, 248, 255, 0.3);
+  /* Light highlight background */
+
   /* Emphasize the table in selected container */
   .route-table {
     background-color: white;
@@ -429,34 +457,44 @@ table {
 }
 
 .time-inputs {
-  display: flex; /* Change from grid to flex for horizontal layout */
-  flex-direction: row; /* Ensure horizontal layout */
-  align-items: center; /* Vertically center the elements */
+  display: flex;
+  /* Change from grid to flex for horizontal layout */
+  flex-direction: row;
+  /* Ensure horizontal layout */
+  align-items: center;
+  /* Vertically center the elements */
   gap: var(--spacing-sm);
   margin-top: var(--spacing-md);
   width: 100%;
   max-width: var(--clock-size);
-  justify-content: center; /* Center the elements horizontally */
+  justify-content: center;
+  /* Center the elements horizontally */
 }
 
 .time-inputs input {
-  width: 80px; /* Set a fixed width for the time input */
+  width: 80px;
+  /* Set a fixed width for the time input */
   padding: 0.5rem;
   font-size: 1rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  text-align: center; /* Center the text inside the input */
+  text-align: center;
+  /* Center the text inside the input */
 }
 
 .time-inputs button {
-  width: auto; /* Let button size to content */
-  min-width: 50px; /* Minimum width for toggle button */
+  width: auto;
+  /* Let button size to content */
+  min-width: 50px;
+  /* Minimum width for toggle button */
   padding: 0.5rem;
   font-size: 1rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  text-align: center; /* Center the text */
-  flex-shrink: 0; /* Prevent button from shrinking */
+  text-align: center;
+  /* Center the text */
+  flex-shrink: 0;
+  /* Prevent button from shrinking */
 }
 
 .time-inputs input[type="number"] {
@@ -489,14 +527,13 @@ table {
   width: 100%;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: linear-gradient(to right, 
-    rgb(13, 8, 135), 
-    rgb(85, 0, 170), 
-    rgb(156, 23, 158), 
-    rgb(205, 62, 78), 
-    rgb(246, 147, 34), 
-    rgb(252, 225, 56)
-  );
+  background: linear-gradient(to right,
+      rgb(13, 8, 135),
+      rgb(85, 0, 170),
+      rgb(156, 23, 158),
+      rgb(205, 62, 78),
+      rgb(246, 147, 34),
+      rgb(252, 225, 56));
 }
 
 .color-scale-labels {
@@ -533,33 +570,34 @@ table {
   width: 100%;
   margin: var(--spacing-lg) auto;
   border-collapse: collapse;
-  
-  th, td {
+
+  th,
+  td {
     padding: var(--table-padding-y) var(--table-padding-x);
     text-align: left;
     border-bottom: 1px solid var(--color-border);
   }
-  
+
   th {
     background-color: #f5f5f5;
     font-weight: bold;
   }
-  
+
   input[type="radio"] {
     cursor: pointer;
   }
-  
+
   input[type="number"] {
     width: 80px;
     padding: 5px;
   }
-  
+
   label {
     cursor: pointer;
     display: inline-block;
     width: 100%;
   }
-  
+
   tr:hover {
     background-color: #f9f9f9;
   }
@@ -579,15 +617,15 @@ table {
     padding: var(--spacing-sm);
     padding-bottom: 2rem;
   }
-  
+
   .clock-wrapper {
     margin: var(--spacing-sm) 0;
   }
-  
+
   .clock-container {
     grid-template-columns: 1fr;
   }
-  
+
   .route-table td,
   .velocity-presets-table td {
     padding: var(--spacing-sm);
@@ -602,67 +640,67 @@ table {
     --spacing-md: 0.5rem;
     --spacing-lg: 1rem;
   }
-  
+
   body {
     padding: 0.25rem;
     padding-bottom: 1rem;
     font-size: 0.9rem;
   }
-  
-  #solveButton, 
+
+  #solveButton,
   .city-search-input,
   .time-inputs input,
   .velocity-presets-table input[type="number"] {
     padding: 0.4rem;
     font-size: 0.9rem;
   }
-  
+
   .clock-label {
     font-size: 1rem;
     margin-bottom: 0.25rem;
   }
-  
+
   .selected-cities button {
     padding: 0.15rem 0.3rem;
     margin-left: 0.3rem;
   }
-  
-  table td, 
+
+  table td,
   .route-table td,
   .velocity-presets-table td {
     padding: 0.25rem;
   }
-  
+
   .time-inputs {
     gap: 0.25rem;
   }
-  
+
   .search-results {
     max-height: 50vh;
   }
-  
+
   .solution-container {
     padding: 0.5rem;
   }
-  
+
   .color-scale {
     height: 20px;
   }
-  
+
   .color-scale-labels {
     font-size: 0.7rem;
   }
-  
+
   #output {
     font-size: 0.9rem;
   }
-  
+
   .velocity-presets-table th,
   .velocity-presets-table td {
     padding: 0.25rem;
     font-size: 0.9rem;
   }
-  
+
   .velocity-presets-table input[type="number"] {
     width: 60px;
     padding: 3px;
@@ -674,66 +712,67 @@ table {
   :root {
     --clock-size: clamp(80px, 60vw, 120px);
   }
-  
+
   body {
     padding: 0.15rem;
     font-size: 0.85rem;
   }
-  
-  #solveButton, 
+
+  #solveButton,
   .city-search-input,
   .time-inputs input,
   .velocity-presets-table input[type="number"] {
     padding: 0.3rem;
     font-size: 0.85rem;
   }
-  
+
   .clock-label {
     font-size: 0.9rem;
   }
-  
+
   .hour-marker div {
     width: 3px;
     height: 8px;
   }
-  
+
   .hour-hand {
     width: 3px;
   }
-  
+
   .minute-hand {
     width: 2px;
   }
-  
+
   .second-hand {
     width: 1px;
   }
-  
+
   .center-dot {
     width: 6px;
     height: 6px;
   }
-  
+
   .time-inputs {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     width: 100%;
   }
-  
+
   .time-inputs input,
   .time-inputs button {
     padding: 0.2rem;
     font-size: 0.8rem;
   }
-  
+
   .velocity-presets-table {
     table-layout: fixed;
-    font-size: 0.7rem; /* Even smaller font */
+    font-size: 0.7rem;
+    /* Even smaller font */
     width: 100%;
     min-width: 0;
     max-width: 100%;
   }
-  
+
   .velocity-presets-table th,
   .velocity-presets-table td {
     padding: 0.15rem;
@@ -742,107 +781,108 @@ table {
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  
+
   .velocity-presets-table th:first-child,
   .velocity-presets-table td:first-child {
     width: 8%;
     min-width: 16px;
   }
-  
+
   .velocity-presets-table th:nth-child(2),
   .velocity-presets-table td:nth-child(2) {
     width: 34%;
   }
-  
+
   .velocity-presets-table th:nth-child(3),
   .velocity-presets-table th:nth-child(4),
   .velocity-presets-table td:nth-child(3),
   .velocity-presets-table td:nth-child(4) {
     width: 29%;
   }
-  
+
   .velocity-presets-table input[type="number"] {
     width: 100%;
     max-width: 40px;
     padding: 0.1rem;
     font-size: 0.65rem;
   }
-  
+
   /* Ultra-narrow screens: force a minimum table width so it doesn't squeeze too much */
   .velocity-presets-table {
     table-layout: fixed;
     min-width: 300px;
-    font-size: 0.7rem; /* Reduce font size further if needed */
+    font-size: 0.7rem;
+    /* Reduce font size further if needed */
   }
-  
+
   /* Make the axis label smaller on very narrow screens */
   .color-scale-axis-label {
     font-size: 0.7rem;
   }
-  
+
   /* For extremely narrow screens */
   @media (max-width: 260px) {
     .velocity-presets-table {
       font-size: 0.6rem;
     }
-    
+
     .velocity-presets-table th,
     .velocity-presets-table td {
       padding: 0.1rem;
     }
-    
+
     .velocity-presets-table input[type="number"] {
       max-width: 30px;
       padding: 0.05rem;
     }
-    
+
     .velocity-presets-table label {
       font-size: 0.6rem;
       line-height: 1;
     }
-    
+
     /* Force shorter text */
     .velocity-presets-table label[for="commercialPreset"]::after {
       content: 'Comm.';
       display: block;
       font-size: 0.6rem;
     }
-    
+
     .velocity-presets-table label[for="commercialPreset"] {
       font-size: 0;
     }
-    
+
     .velocity-presets-table label[for="concordePreset"]::after {
       content: 'Conc.';
       display: block;
       font-size: 0.6rem;
     }
-    
+
     .velocity-presets-table label[for="concordePreset"] {
       font-size: 0;
     }
-    
+
     .velocity-presets-table label[for="extremePreset"]::after {
       content: 'Extr.';
       display: block;
       font-size: 0.6rem;
     }
-    
+
     .velocity-presets-table label[for="extremePreset"] {
       font-size: 0;
     }
-    
+
     .velocity-presets-table label[for="customPreset"]::after {
       content: 'Cust.';
       display: block;
       font-size: 0.6rem;
     }
-    
+
     .velocity-presets-table label[for="customPreset"] {
       font-size: 0;
     }
   }
-  
+
   /* Fixes for odd aspect ratios */
   @supports (aspect-ratio: 9/21) {
     body {
@@ -850,7 +890,7 @@ table {
       padding-left: 0.1rem;
       padding-right: 0.1rem;
     }
-    
+
     .clock-wrapper {
       transform: scale(0.9);
       margin-bottom: -0.5rem;
@@ -863,7 +903,7 @@ table {
   #map {
     height: 50vh;
   }
-  
+
   .clock-container {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -874,7 +914,7 @@ table {
   button {
     border: 2px solid currentColor;
   }
-  
+
   .solution-container.selected {
     border-width: 3px;
   }
@@ -882,11 +922,12 @@ table {
 
 /* Animation preferences */
 @media (prefers-reduced-motion: reduce) {
+
   .solution-container,
   #solveButton {
     transition: none;
   }
-  
+
   .second-hand {
     animation: none;
   }
@@ -897,15 +938,15 @@ table {
   .no-print {
     display: none !important;
   }
-  
+
   body {
     padding: 0;
   }
-  
+
   #map {
     height: 500px;
   }
-  
+
   .solution-container {
     border: 1px solid black;
     page-break-inside: avoid;
@@ -916,29 +957,6 @@ table {
 .scroll-container {
   width: 100%;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* Improve scrolling on iOS */
-}
-
-/* Add these styles to your existing stylesheet */
-
-/* Ensure that map controls don't interfere with arrow visibility */
-.ol-control {
-  z-index: 10;
-}
-
-/* Enhance route highlighting when selected */
-.solution-container.selected {
-  box-shadow: 0 0 0 2px #0078d4;
-  
-  .route-table {
-    tr:hover {
-      background-color: rgba(0, 120, 212, 0.1);
-    }
-  }
-}
-
-/* Style for route arrows */
-.ol-layer canvas {
-  /* Improve rendering quality for canvas elements containing our arrows */
-  image-rendering: high-quality;
+  -webkit-overflow-scrolling: touch;
+  /* Improve scrolling on iOS */
 }

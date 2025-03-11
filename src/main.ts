@@ -7,7 +7,7 @@ import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
-import { Circle, Style, Fill, Stroke, Text, Icon } from 'ol/style';
+import { Circle, Style, Fill, Stroke, Text } from 'ol/style';
 import { fromLonLat } from 'ol/proj';
 import LineString from 'ol/geom/LineString';
 import * as arcjs from 'arc';
@@ -71,7 +71,7 @@ const state = {
     fuse: null as Fuse<City> | null,
     selectedCities: [] as City[],
     selectedSearchIndex: 0,
-   selectedRouteIndex: 0, // New state to track selected route
+    selectedRouteIndex: 0, // New state to track selected route
     velocityMin: 0,
     velocityMax: 0,
     currentArcs: [] as Feature[],
@@ -111,13 +111,13 @@ function setupMap(): void {
         const mapEl = document.getElementById('map');
         if (mapEl) {
             mapEl.style.maxWidth = '100%';
-            
+
             // Set initial height based on current width
             const updateMapHeight = () => {
                 const width = mapEl.offsetWidth;
                 mapEl.style.height = `${width / 2}px`;
             };
-            
+
             // Update height initially and on resize
             updateMapHeight();
             window.addEventListener('resize', updateMapHeight);
@@ -163,7 +163,7 @@ function drawGreatCircleArc(from: City, to: City): Feature {
         // Look up the velocity between these cities in the current route
         const fromCityName = from.name;
         const toCityName = to.name;
-        
+
         // Get velocity from the selected route for this segment
         let velocity = 0;
         if (state.currentRoute && state.currentRoute.length > 0) {
@@ -206,11 +206,7 @@ function drawGreatCircleArc(from: City, to: City): Feature {
                 })
             });
 
-            // Create arrow styles along the line
-            const arrowStyles = createArrowStyles(lineCoords, arcColor);
-
-            // Combine the line style with arrow styles
-            lineFeature.setStyle([lineStyle, ...arrowStyles]);
+            lineFeature.setStyle([lineStyle]);
 
             vectorSource.addFeature(lineFeature);
             features.push(lineFeature);
@@ -235,72 +231,11 @@ function drawGreatCircleArc(from: City, to: City): Feature {
             })
         });
 
-        // Create arrow styles for error case
-        const arrowStyles = createArrowStyles(lineCoordinates, '#ff0000');
-
-        // Combine the line style with arrow styles
-        lineFeature.setStyle([lineStyle, ...arrowStyles]);
+        lineFeature.setStyle([lineStyle]);
 
         vectorSource.addFeature(lineFeature);
         return lineFeature;
     }
-}
-
-// New helper: generate a data URL for a simple arrow image
-function generateArrowDataUrl(color: string): string {
-    // Create a canvas and draw an arrow shape
-    const canvas = document.createElement('canvas');
-    canvas.width = 20;
-    canvas.height = 20;
-    const ctx = canvas.getContext('2d')!;
-    ctx.translate(10, 10);
-    ctx.rotate(0);
-    ctx.beginPath();
-    ctx.moveTo(10, 0);    // tip
-    ctx.lineTo(-5, -5);   // left corner
-    ctx.lineTo(-2, 0);    // indent
-    ctx.lineTo(-5, 5);    // right corner
-    ctx.closePath();
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-    return canvas.toDataURL();
-}
-
-function createArrowIcon(color: string, rotation: number): Icon {
-    return new Icon({
-        src: generateArrowDataUrl(color),
-        rotation: rotation, // changed from -rotation to rotation so the arrow points in one direction
-        rotateWithView: true,
-        anchor: [0.5, 0.5],
-        scale: 0.5  // adjust as needed
-    });
-}
-
-function createArrowStyles(coordinates: number[][], color: string): Style[] {
-    const styles: Style[] = [];
-    const lineLength = coordinates.length;
-    const numArrows = Math.min(Math.max(Math.floor(lineLength / 25), 3), 6);
-    
-    for (let i = 1; i <= numArrows; i++) {
-        const pointIndex = Math.floor(i * lineLength / (numArrows + 1));
-        if (pointIndex < 1 || pointIndex >= lineLength - 1) continue;
-        
-        const point = coordinates[pointIndex];
-        const prevPoint = coordinates[pointIndex - 1];
-        const dx = point[0] - prevPoint[0];
-        const dy = point[1] - prevPoint[1];
-        const rotation = Math.atan2(dy, dx);
-        
-        const arrowStyle = new Style({
-            geometry: new Point(point),
-            image: createArrowIcon(color, rotation)
-        });
-        styles.push(arrowStyle);
-    }
-    return styles;
 }
 
 function calculateGreatCircleArc(from: City, to: City, numPoints: number = 100): ArcCoordinates[] {
@@ -357,7 +292,7 @@ function selectCity(city: City): void {
     if (!isCitySelected(city)) {
         state.selectedCities.push(city);
         updateSelectedCitiesUI();
-        
+
         // Scroll to the selected cities container
         const selectedCitiesContainer = document.querySelector('.selected-cities');
         if (selectedCitiesContainer) {
@@ -474,25 +409,25 @@ function setupRouteKeyboardNavigation(): void {
         // Only handle keyboard navigation when search results are not visible
         const searchResults = document.querySelector('.search-results');
         if (searchResults && searchResults.innerHTML.trim() !== '') return;
-        
+
         const routeContainers = document.querySelectorAll('.solution-container');
         const routeCount = routeContainers.length;
-        
+
         if (routeCount === 0) return;
-        
+
         switch (event.key) {
             case 'ArrowDown':
                 event.preventDefault();
                 state.selectedRouteIndex = (state.selectedRouteIndex + 1) % routeCount;
                 updateSelectedRoute(routeContainers, state.selectedRouteIndex);
                 break;
-                
+
             case 'ArrowUp':
                 event.preventDefault();
                 state.selectedRouteIndex = (state.selectedRouteIndex - 1 + routeCount) % routeCount;
                 updateSelectedRoute(routeContainers, state.selectedRouteIndex);
                 break;
-                
+
             case 'Enter':
                 event.preventDefault();
                 if (routeCount > 0) {
@@ -509,7 +444,7 @@ function updateSelectedRoute(items: NodeListOf<Element>, index: number): void {
     items.forEach(item => {
         item.classList.remove('keyboard-focus');
     });
-    
+
     // Add visual focus to the selected route (without toggling selection)
     const selectedItem = items[index] as HTMLElement;
     selectedItem.classList.add('keyboard-focus');
@@ -812,11 +747,11 @@ function setupSolveButton(
         const leftAmPm = (document.getElementById(`ampmToggle-left`) as HTMLButtonElement).textContent;
         const rightTimeInput = document.getElementById(`timeInput-right`) as HTMLInputElement;
         const rightAmPm = (document.getElementById(`ampmToggle-right`) as HTMLButtonElement).textContent;
-        
+
         // Parse the time values
         const [leftHourStr, leftMinuteStr] = leftTimeInput.value.split(':');
         const [rightHourStr, rightMinuteStr] = rightTimeInput.value.split(':');
-        
+
         const leftHour = parseInt(leftHourStr);
         const leftMinute = parseInt(leftMinuteStr);
         const rightHour = parseInt(rightHourStr);
@@ -872,7 +807,7 @@ function setupSolveButton(
                 routeContainer.innerHTML += `<p>Status: ${result.status}</p>`;
                 const solutionContainers = routeContainer.querySelectorAll('.solution-container');
                 state.selectedRouteIndex = 0; // Reset route index whenever new solutions are shown
-                
+
                 solutionContainers.forEach((container, index) => {
                     container.addEventListener('click', (event) => {
                         document.querySelectorAll('.solution-container').forEach(c => {
@@ -881,10 +816,10 @@ function setupSolveButton(
 
                         const target = event.currentTarget as HTMLElement;
                         target.classList.toggle('selected');
-                        
+
                         // Update selected route index when clicked
                         state.selectedRouteIndex = index;
-                        
+
                         const solutionClickEvent = new CustomEvent('solution-click', {
                             detail: {
                                 html: target.innerHTML,
@@ -894,7 +829,7 @@ function setupSolveButton(
                         });
                         document.dispatchEvent(solutionClickEvent);
                     });
-                    
+
                     // Add visual indicator for keyboard focus on first route
                     if (index === 0) {
                         container.classList.add('keyboard-focus');
@@ -923,15 +858,15 @@ function setupSearchUI(): void {
 
 function updateColorScale(min: number, max: number): void {
     const labelsContainer = document.querySelector('.color-scale-labels') as HTMLElement;
-    
+
     // Clear existing labels
     labelsContainer.innerHTML = '';
-    
+
     // Add min label - removed km/h
     const minLabel = document.createElement('span');
     minLabel.textContent = `${min}`;
     labelsContainer.appendChild(minLabel);
-    
+
     // Add intermediate labels if the range is large enough
     const range = max - min;
     if (range > 500) {
@@ -943,7 +878,7 @@ function updateColorScale(min: number, max: number): void {
             labelsContainer.appendChild(label);
         }
     }
-    
+
     // Add max label - removed km/h
     const maxLabel = document.createElement('span');
     maxLabel.textContent = `${max}`;
@@ -952,72 +887,72 @@ function updateColorScale(min: number, max: number): void {
 
 // --- Velocity Preset Configuration ---
 const presets = {
-  commercial: { min: 500, max: 900 },
-  concorde: { min: 500, max: 2500 },
-  extreme: { min: 13, max: 7200 },
-  custom: { min: 13, max: 7200 }
+    commercial: { min: 500, max: 900 },
+    concorde: { min: 500, max: 2500 },
+    extreme: { min: 13, max: 7200 },
+    custom: { min: 13, max: 7200 }
 };
 
 function setupvelocityPresets(): void {
-  try {
-    const velocityMinInput = getElement<HTMLInputElement>('#velocityMin');
-    const velocityMaxInput = getElement<HTMLInputElement>('#velocityMax');
-    
-    // Initialize state with extreme values (changed from commercial)
-    state.velocityMin = presets.extreme.min;
-    state.velocityMax = presets.extreme.max;
-    
-    // Set up radio button listeners
-    document.querySelectorAll('input[name="velocityPreset"]').forEach((radio) => {
-      radio.addEventListener('change', (event) => {
-        const presetType = (event.target as HTMLInputElement).value;
-        const preset = presets[presetType as keyof typeof presets];
-        
-        if (presetType === 'custom') {
-          // Enable custom inputs
-          velocityMinInput.disabled = false;
-          velocityMaxInput.disabled = false;
-          
-          // Use existing values or default
-          state.velocityMin = parseInt(velocityMinInput.value) || preset.min;
-          state.velocityMax = parseInt(velocityMaxInput.value) || preset.max;
-        } else {
-          // Disable custom inputs for fixed presets
-          velocityMinInput.disabled = true;
-          velocityMaxInput.disabled = true;
-          
-          // Set to preset values
-          state.velocityMin = preset.min;
-          state.velocityMax = preset.max;
-          
-          // Update input fields to show the preset values
-          velocityMinInput.value = preset.min.toString();
-          velocityMaxInput.value = preset.max.toString();
-        }
-        
-        updateColorScale(state.velocityMin, state.velocityMax);
-      });
-    });
-    
-    // Add listeners for custom input changes
-    velocityMinInput.addEventListener('change', (event) => {
-      if (!velocityMinInput.disabled) {
-        state.velocityMin = parseInt((event.target as HTMLInputElement).value);
-        updateColorScale(state.velocityMin, state.velocityMax);
-      }
-    });
-    
-    velocityMaxInput.addEventListener('change', (event) => {
-      if (!velocityMaxInput.disabled) {
-        state.velocityMax = parseInt((event.target as HTMLInputElement).value);
-        updateColorScale(state.velocityMin, state.velocityMax);
-      }
-    });
-    
-    console.log("Velocity presets setup complete");
-  } catch (error) {
-    console.error("Failed to set up velocity presets:", error);
-  }
+    try {
+        const velocityMinInput = getElement<HTMLInputElement>('#velocityMin');
+        const velocityMaxInput = getElement<HTMLInputElement>('#velocityMax');
+
+        // Initialize state with extreme values (changed from commercial)
+        state.velocityMin = presets.extreme.min;
+        state.velocityMax = presets.extreme.max;
+
+        // Set up radio button listeners
+        document.querySelectorAll('input[name="velocityPreset"]').forEach((radio) => {
+            radio.addEventListener('change', (event) => {
+                const presetType = (event.target as HTMLInputElement).value;
+                const preset = presets[presetType as keyof typeof presets];
+
+                if (presetType === 'custom') {
+                    // Enable custom inputs
+                    velocityMinInput.disabled = false;
+                    velocityMaxInput.disabled = false;
+
+                    // Use existing values or default
+                    state.velocityMin = parseInt(velocityMinInput.value) || preset.min;
+                    state.velocityMax = parseInt(velocityMaxInput.value) || preset.max;
+                } else {
+                    // Disable custom inputs for fixed presets
+                    velocityMinInput.disabled = true;
+                    velocityMaxInput.disabled = true;
+
+                    // Set to preset values
+                    state.velocityMin = preset.min;
+                    state.velocityMax = preset.max;
+
+                    // Update input fields to show the preset values
+                    velocityMinInput.value = preset.min.toString();
+                    velocityMaxInput.value = preset.max.toString();
+                }
+
+                updateColorScale(state.velocityMin, state.velocityMax);
+            });
+        });
+
+        // Add listeners for custom input changes
+        velocityMinInput.addEventListener('change', (event) => {
+            if (!velocityMinInput.disabled) {
+                state.velocityMin = parseInt((event.target as HTMLInputElement).value);
+                updateColorScale(state.velocityMin, state.velocityMax);
+            }
+        });
+
+        velocityMaxInput.addEventListener('change', (event) => {
+            if (!velocityMaxInput.disabled) {
+                state.velocityMax = parseInt((event.target as HTMLInputElement).value);
+                updateColorScale(state.velocityMin, state.velocityMax);
+            }
+        });
+
+        console.log("Velocity presets setup complete");
+    } catch (error) {
+        console.error("Failed to set up velocity presets:", error);
+    }
 }
 
 // --- Utilities ---
@@ -1093,7 +1028,7 @@ function parseRouteFromHtml(htmlContent: string): Array<{ from: string, to: stri
     tempDiv.innerHTML = htmlContent;
 
     const rows = tempDiv.querySelectorAll('.route-table tr');
-    
+
     // Initialize velocity min/max
     let minVelocity = Number.MAX_VALUE;
     let maxVelocity = Number.MIN_VALUE;
@@ -1105,15 +1040,15 @@ function parseRouteFromHtml(htmlContent: string): Array<{ from: string, to: stri
             const to = cells[1].textContent?.trim() || '';
             const velocityText = cells[3].textContent?.trim() || '0';
             const velocity = parseInt(velocityText.replace(/[^\d]/g, ''));
-            
+
             // Update min/max velocity
             if (velocity < minVelocity) minVelocity = velocity;
             if (velocity > maxVelocity) maxVelocity = velocity;
-            
+
             route.push({ from, to, velocity });
         }
     }
-    
+
     // Update state with the route's velocity range
     if (route.length > 0) {
         state.velocityMin = minVelocity;
@@ -1183,15 +1118,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (isSelected) {
             const routeData = parseRouteFromHtml(customEvent.detail.html);
-            
+
             // Store the current route in state
             state.currentRoute = routeData;
-            
+
             // Update color scale with the route's velocity range
             if (scaleLabels) {
                 updateColorScale(state.velocityMin, state.velocityMax);
             }
-            
+
             // Draw the route arcs using the updated velocity range
             drawRouteArcs(routeData);
         } else {
