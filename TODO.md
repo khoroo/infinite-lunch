@@ -1,6 +1,5 @@
 - Color scale markers for readability
 - Hover-over arc details (velocity, duration, city pair)
-- Improve UI text for clarity
 - Explore background color options
 - add a toggle for second hand animation
 - add alt text / make sure keyboard accessible
