@@ -39,7 +39,10 @@ export function setupMap(): void {
             view: new View({
                 center: [0, 0],
                 zoom: 1,
-                constrainResolution: true
+                // Remove constraint on zoom resolution to enable fractional zoom levels
+                constrainResolution: false,
+                // Add smaller zoom factor for more sensitive zooming (default is 2)
+                zoomFactor: 1.2
             }),
         });
 
