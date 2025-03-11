@@ -19,6 +19,8 @@
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
+  --table-padding-x: 0.5rem;  /* New variable for horizontal table padding */
+  --table-padding-y: 0.5rem;  /* New variable for vertical table padding */
 }
 
 /* Add styles for paragraphs to limit width */
@@ -176,10 +178,11 @@ button {
 table {
   border-collapse: collapse;
   width: 100%;
-}
-
-table td {
-  padding: var(--spacing-sm) var(--spacing-md);
+  
+  td, th {
+    padding: var(--table-padding-y) var(--table-padding-x);
+    text-align: left;
+  }
 }
 
 /* Map styling */
@@ -225,30 +228,31 @@ table td {
   margin-bottom: 0;
   margin-top: var(--spacing-md);
   font-size: clamp(0.875rem, 2.5vw, 1rem);
-}
-
-.route-table th,
-.route-table td {
-  padding: var(--spacing-sm);
-  text-align: left;
-  border: 1px solid var(--color-border);
-}
-
-.route-table th {
-  background-color: #f5f5f5;
-  font-weight: bold;
-}
-
-.route-table tr:last-child td {
-  border-bottom: none;
-}
-
-.route-table tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-.route-table tr:hover {
-  background-color: var(--color-hover);
+  
+  th, td {
+    padding: var(--table-padding-y) var(--table-padding-x);
+    text-align: left;
+    border: 1px solid var(--color-border);
+  }
+  
+  th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+  }
+  
+  tr {
+    &:last-child td {
+      border-bottom: none;
+    }
+    
+    &:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    
+    &:hover {
+      background-color: var(--color-hover);
+    }
+  }
 }
 
 /* Solution container */
@@ -470,37 +474,36 @@ table td {
   width: 100%;
   margin: var(--spacing-lg) auto;
   border-collapse: collapse;
-}
-
-.velocity-presets-table th,
-.velocity-presets-table td {
-  padding: 0.75rem;
-  text-align: left;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.velocity-presets-table th {
-  background-color: #f5f5f5;
-  font-weight: bold;
-}
-
-.velocity-presets-table input[type="radio"] {
-  cursor: pointer;
-}
-
-.velocity-presets-table input[type="number"] {
-  width: 80px;
-  padding: 5px;
-}
-
-.velocity-presets-table label {
-  cursor: pointer;
-  display: inline-block;
-  width: 100%;
-}
-
-.velocity-presets-table tr:hover {
-  background-color: #f9f9f9;
+  
+  th, td {
+    padding: var(--table-padding-y) var(--table-padding-x);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+  }
+  
+  th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+  }
+  
+  input[type="radio"] {
+    cursor: pointer;
+  }
+  
+  input[type="number"] {
+    width: 80px;
+    padding: 5px;
+  }
+  
+  label {
+    cursor: pointer;
+    display: inline-block;
+    width: 100%;
+  }
+  
+  tr:hover {
+    background-color: #f9f9f9;
+  }
 }
 
 /* NEW: Velocity table wrapper to allow horizontal scrolling */
