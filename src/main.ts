@@ -51,6 +51,14 @@ function selectCity(city: City): void {
         if (selectedCitiesContainer) {
             selectedCitiesContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
+        
+        // If we now have at least 2 cities, clear any existing warning in the route container
+        if (state.selectedCities.length === 2) {
+            const routeContainer = document.querySelector<HTMLElement>('#routeContainer');
+            if (routeContainer && routeContainer.innerHTML.includes('Select at least two cities')) {
+                routeContainer.innerHTML = '';
+            }
+        }
     }
 
     clearSearch();
@@ -588,14 +596,16 @@ function setupSolveButton(
     }
 
     solveButton.addEventListener('click', () => {
+        // Clear any existing content including previous warnings
         routeContainer.innerHTML = '';
         routeContainer.style.display = 'block';
 
         if (state.selectedCities.length < 2) {
-            routeContainer.innerHTML = '<p>Select at least two cities</p>';
+            routeContainer.innerHTML = '<div class="solver-status status-warning">Select at least two cities</div>';
             return;
         }
 
+        // Continue with the solving process
         const distanceMatrix = calculateDistanceMatrix(state.selectedCities);
         const timeMatrix = calculateTimeMatrix(state.selectedCities);
 
