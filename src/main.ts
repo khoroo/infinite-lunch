@@ -770,7 +770,6 @@ function setupvelocityPresets(): void {
                     velocityMaxInput.value = preset.max.toString();
                 }
 
-                updateColorScale(state.velocityMin, state.velocityMax);
             });
         });
 
