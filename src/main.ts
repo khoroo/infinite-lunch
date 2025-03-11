@@ -927,9 +927,9 @@ function updateColorScale(min: number, max: number): void {
     // Clear existing labels
     labelsContainer.innerHTML = '';
     
-    // Add min label
+    // Add min label - removed km/h
     const minLabel = document.createElement('span');
-    minLabel.textContent = `${min} km/h`;
+    minLabel.textContent = `${min}`;
     labelsContainer.appendChild(minLabel);
     
     // Add intermediate labels if the range is large enough
@@ -939,14 +939,14 @@ function updateColorScale(min: number, max: number): void {
         for (let i = 1; i <= 3; i++) {
             const value = min + Math.round((range * i) / 4);
             const label = document.createElement('span');
-            label.textContent = `${value} km/h`;
+            label.textContent = `${value}`; // removed km/h
             labelsContainer.appendChild(label);
         }
     }
     
-    // Add max label
+    // Add max label - removed km/h
     const maxLabel = document.createElement('span');
-    maxLabel.textContent = `${max} km/h`;
+    maxLabel.textContent = `${max}`;
     labelsContainer.appendChild(maxLabel);
 }
 
@@ -1167,13 +1167,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setupvelocityPresets(); // Replace setupvelocityMinInput, setupvelocityMaxInput, and setupPresetButtons
     setupMap();
     setupRouteKeyboardNavigation(); // Add this new function call
-    
-    // Initialize color scale with default values
-    updateColorScale(state.velocityMin, state.velocityMax);
 
     document.addEventListener('solution-click', (event: Event) => {
         const customEvent = event as CustomEvent;
-
         const isSelected = customEvent.detail.isSelected;
 
         const scaleLabels = document.querySelector('.color-scale-labels');
