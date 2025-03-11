@@ -45,19 +45,20 @@ function createClockDOM(clockSide: 'left' | 'right'): void {
     const centerDot = document.createElement('div');
     centerDot.className = 'center-dot';
     clock.appendChild(centerDot);
+    
     const timeInputs = document.createElement('div');
     timeInputs.className = 'time-inputs';
-    const hourInput = document.createElement('input');
-    hourInput.type = 'number';
-    hourInput.id = `hourInput-${clockSide}`;
-    timeInputs.appendChild(hourInput);
-    const minuteInput = document.createElement('input');
-    minuteInput.type = 'number';
-    minuteInput.id = `minuteInput-${clockSide}`;
-    timeInputs.appendChild(minuteInput);
+    
+    // Create a single time input
+    const timeInput = document.createElement('input');
+    timeInput.type = 'time';
+    timeInput.id = `timeInput-${clockSide}`;
+    timeInputs.appendChild(timeInput);
+    
     const ampmToggle = document.createElement('button');
     ampmToggle.id = `ampmToggle-${clockSide}`;
     timeInputs.appendChild(ampmToggle);
+    
     clockWrapper.appendChild(clock);
     clockWrapper.appendChild(timeInputs);
     document.querySelector('.clock-container')?.appendChild(clockWrapper);
@@ -74,9 +75,7 @@ function initializeClock(clockSide: 'left' | 'right', initialHour: number, initi
     const clock = document.getElementById(`clock-${clockSide}`) as HTMLElement;
     const hourHand = clock.querySelector('.hour-hand') as HTMLElement;
     const minuteHand = clock.querySelector('.minute-hand') as HTMLElement;
-    // const secondHand = clock.querySelector('.second-hand') as HTMLElement;
-    const hourInput = document.getElementById(`hourInput-${clockSide}`) as HTMLInputElement;
-    const minuteInput = document.getElementById(`minuteInput-${clockSide}`) as HTMLInputElement;
+    const timeInput = document.getElementById(`timeInput-${clockSide}`) as HTMLInputElement;
     const ampmToggle = document.getElementById(`ampmToggle-${clockSide}`) as HTMLButtonElement;
 
     // Function to update the clock state immutably
@@ -87,8 +86,11 @@ function initializeClock(clockSide: 'left' | 'right', initialHour: number, initi
 
     // Function to update the clock display based on the current state
     const updateClockDisplay = (): void => {
-        hourInput.value = clockState.hour.toString().padStart(2, '0');
-        minuteInput.value = clockState.minute.toString().padStart(2, '0');
+        // Format the time for the time input (HH:MM format)
+        const formattedHour = clockState.hour.toString().padStart(2, '0');
+        const formattedMinute = clockState.minute.toString().padStart(2, '0');
+        timeInput.value = `${formattedHour}:${formattedMinute}`;
+        
         ampmToggle.textContent = clockState.ampm;
 
         const hourAngle = (clockState.ampm === 'AM' ? (clockState.hour % 12) : ((clockState.hour % 12) + 12)) * 30 + (clockState.minute / 60) * 30;
@@ -103,61 +105,108 @@ function initializeClock(clockSide: 'left' | 'right', initialHour: number, initi
         updateClockState({ ampm: clockState.ampm === 'AM' ? 'PM' : 'AM' });
     });
 
-    // Start dragging only on hour hand
-    function startDrag(e: MouseEvent): void {
+    // Function to handle both mouse and touch events for dragging
+    const handleDragStart = (e: MouseEvent | TouchEvent): void => {
         e.preventDefault();
-        draggedHand = e.target as HTMLElement;
+        const target = e.target as HTMLElement;
+        draggedHand = target;
         activeClock = clockSide;
-    }
-    hourHand.addEventListener('mousedown', startDrag);
+        
+        // Add a class to indicate dragging state
+        document.body.classList.add('dragging-clock-hand');
+    };
 
-    // Stop dragging
-    document.addEventListener('mouseup', () => {
+    // Start dragging on mouse down
+    hourHand.addEventListener('mousedown', handleDragStart);
+    minuteHand.addEventListener('mousedown', handleDragStart);
+    
+    // Add touch event support for mobile
+    hourHand.addEventListener('touchstart', handleDragStart, { passive: false });
+    minuteHand.addEventListener('touchstart', handleDragStart, { passive: false });
+
+    // Stop dragging on mouse up or touch end
+    const handleDragEnd = (): void => {
         draggedHand = null;
         activeClock = null;
-    });
+        document.body.classList.remove('dragging-clock-hand');
+    };
+    
+    document.addEventListener('mouseup', handleDragEnd);
+    document.addEventListener('touchend', handleDragEnd);
 
-    // Drag movement
-    document.addEventListener('mousemove', (e) => {
+    // Handle drag movement for both mouse and touch
+    const handleDragMove = (e: MouseEvent | TouchEvent): void => {
         if (draggedHand && activeClock === clockSide) {
             e.preventDefault();
+            
             const rect = clock.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
-            const dx = e.clientX - centerX;
-            const dy = e.clientY - centerY;
+            
+            // Get coordinates based on event type
+            let clientX, clientY;
+            
+            if (e instanceof MouseEvent) {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            } else {
+                // Touch event
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            }
+            
+            const dx = clientX - centerX;
+            const dy = clientY - centerY;
             let angle = (Math.atan2(dx, -dy) * 180 / Math.PI + 360) % 360;
-            draggedHand.style.transform = `translateX(-50%) rotate(${angle}deg)`;
-
+            
+            // Update the appropriate hand based on which one is being dragged
             if (draggedHand.classList.contains('hour-hand')) {
+                draggedHand.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+                
                 const hours = Math.floor(angle / 30) % 12;
                 const hourDisplay = (hours === 0 ? 12 : hours);
                 const additionalDegrees = angle % 30;
                 const minutesFromHour = Math.floor((additionalDegrees / 30) * 60);
-                updateClockState({ hour: hourDisplay, minute: minutesFromHour });
+                
+                updateClockState({ 
+                    hour: hourDisplay, 
+                    minute: minutesFromHour 
+                });
+            } else if (draggedHand.classList.contains('minute-hand')) {
+                draggedHand.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+                
+                const minutes = Math.floor(angle / 6) % 60;
+                updateClockState({ minute: minutes });
             }
+        }
+    };
+
+    // Add both mouse and touch move event listeners
+    document.addEventListener('mousemove', handleDragMove);
+    document.addEventListener('touchmove', handleDragMove, { passive: false });
+
+    // Sync clock hands with time input
+    timeInput.addEventListener('input', () => {
+        const timeValue = timeInput.value;
+        if (timeValue) {
+            const [hourStr, minuteStr] = timeValue.split(':');
+            const hour = parseInt(hourStr);
+            const minute = parseInt(minuteStr);
+            
+            // Determine AM/PM based on 24-hour format
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const hour12 = hour % 12 || 12;
+            
+            updateClockState({ 
+                hour: hour12,
+                minute: minute,
+                ampm: ampm
+            });
         }
     });
 
-    // Sync clock hands with inputs
-    hourInput.addEventListener('input', () => {
-        updateClockState({ hour: parseInt(hourInput.value) || 0 });
-    });
-    minuteInput.addEventListener('input', () => {
-        updateClockState({ minute: parseInt(minuteInput.value) || 0 });
-    });
-
-    // Second hand
-    // function updateSecondHand(): void {
-    //     const now = new Date();
-    //     const seconds = now.getSeconds();
-    //     secondHand.style.transform = `translateX(-50%) rotate(${seconds * 6}deg)`;
-    // }
-
     // Initialize
     updateClockDisplay();
-    // updateSecondHand();
-    // setInterval(updateSecondHand, 1000);
 }
 
 // Create both clocks

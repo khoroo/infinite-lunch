@@ -633,13 +633,20 @@ function setupSolveButton(
         const distanceMatrix = calculateDistanceMatrix(state.selectedCities);
         const timeMatrix = calculateTimeMatrix(state.selectedCities);
 
-        // Get the time difference from the clock elements
-        const leftHour = parseInt((document.getElementById(`hourInput-left`) as HTMLInputElement).value);
-        const leftMinute = parseInt((document.getElementById(`minuteInput-left`) as HTMLInputElement).value);
+        // Get the time difference from the clock elements - updated for time input
+        const leftTimeInput = document.getElementById(`timeInput-left`) as HTMLInputElement;
         const leftAmPm = (document.getElementById(`ampmToggle-left`) as HTMLButtonElement).textContent;
-        const rightHour = parseInt((document.getElementById(`hourInput-right`) as HTMLInputElement).value);
-        const rightMinute = parseInt((document.getElementById(`minuteInput-right`) as HTMLInputElement).value);
+        const rightTimeInput = document.getElementById(`timeInput-right`) as HTMLInputElement;
         const rightAmPm = (document.getElementById(`ampmToggle-right`) as HTMLButtonElement).textContent;
+        
+        // Parse the time values
+        const [leftHourStr, leftMinuteStr] = leftTimeInput.value.split(':');
+        const [rightHourStr, rightMinuteStr] = rightTimeInput.value.split(':');
+        
+        const leftHour = parseInt(leftHourStr);
+        const leftMinute = parseInt(leftMinuteStr);
+        const rightHour = parseInt(rightHourStr);
+        const rightMinute = parseInt(rightMinuteStr);
 
         // Convert to minutes from midnight
         let leftTime = leftHour * 60 + leftMinute;
