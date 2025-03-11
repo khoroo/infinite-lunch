@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="./favicon.ico" />
   <title>Infinite Lunch</title>
-  <script type="module" crossorigin src="https://robert.sparks.me.uk/infinite-lunch/assets/index-DVx3eexe.js"></script>
-  <link rel="stylesheet" crossorigin href="https://robert.sparks.me.uk/infinite-lunch/assets/index-CEy1_4al.css">
+  <script type="module" crossorigin src="https://robert.sparks.me.uk/infinite-lunch/assets/index-CKvlObGv.js"></script>
+  <link rel="stylesheet" crossorigin href="https://robert.sparks.me.uk/infinite-lunch/assets/index-oZgY-0Ao.css">
 </head>
 
 <body>
@@ -20,6 +20,7 @@
     <div class="color-scale-container">
       <div id="color-scale" class="color-scale"></div>
       <div class="color-scale-labels"></div>
+      <div class="color-scale-axis-label">velocity in km/h</div>
     </div>
     <!-- Wrap velocity table in a scrollable container -->
     <p>The problem becomes easier or harder depending on how slow and fast we can fly. Use a (generous) preset of typical commercial aircraft, concorde and extreme - the slowest and fastest recorded velocities of a powered aircraft.</p>
@@ -32,10 +33,10 @@
           <th>Max</th>
         </tr>
         <tr>
-          <td><input type="radio" name="velocityPreset" id="commercialPreset" value="commercial"></td>
-          <td><label for="commercialPreset">Commercial</label></td>
-          <td>500</td>
-          <td>900</td>
+          <td><input type="radio" name="velocityPreset" id="extremePreset" value="extreme" checked></td>
+          <td><label for="extremePreset">Extreme</label></td>
+          <td>13</td>
+          <td>7200</td>
         </tr>
         <tr>
           <td><input type="radio" name="velocityPreset" id="concordePreset" value="concorde"></td>
@@ -44,10 +45,10 @@
           <td>2500</td>
         </tr>
         <tr>
-          <td><input type="radio" name="velocityPreset" id="extremePreset" value="extreme" checked></td>
-          <td><label for="extremePreset">Extreme</label></td>
-          <td>13</td>
-          <td>7200</td>
+          <td><input type="radio" name="velocityPreset" id="commercialPreset" value="commercial"></td>
+          <td><label for="commercialPreset">Commercial</label></td>
+          <td>500</td>
+          <td>900</td>
         </tr>
         <tr>
           <td><input type="radio" name="velocityPreset" id="customPreset" value="custom"></td>
