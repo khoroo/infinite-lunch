@@ -74,13 +74,13 @@ export function addCityMarker(city: City, index: number): void {
             fill: new Fill({ color: 'rgba(0, 153, 255, 0.6)' }),
             stroke: new Stroke({ color: '#fff', width: 2 }),
         }),
-        text: new Text({
-            text: String(index + 1),
-            fill: new Fill({ color: '#fff' }),
-            font: '12px sans-serif',
-            textAlign: 'center',
-            textBaseline: 'middle',
-        }),
+        // text: new Text({
+        //     text: String(index + 1),
+        //     fill: new Fill({ color: '#fff' }),
+        //     font: '12px sans-serif',
+        //     textAlign: 'center',
+        //     textBaseline: 'middle',
+        // }),
     });
 
     const cityFeature = new Feature({
