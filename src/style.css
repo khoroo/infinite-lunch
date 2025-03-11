@@ -1,8 +1,7 @@
 @import "/node_modules/ol/ol.css";
 
 :root {
-  --main-max-width: min(1200px, 95%);
-  --paragraph-max-width: min(700px, 100%);  /* New variable for paragraph width */
+  --main-max-width: min(900px, 95%);  /* Changed from 1200px to 900px */
   --clock-size: clamp(120px, 30vw, 200px);
   --mobile-breakpoint: 768px;
   --narrow-breakpoint: 400px;
@@ -24,7 +23,7 @@
 
 /* Add styles for paragraphs to limit width */
 p {
-  max-width: var(--paragraph-max-width);
+  /* max-width: var(); */
   margin-left: 0; /* Left align paragraphs instead of centering */
   margin-right: 0;
   line-height: 1.5;
