@@ -835,6 +835,12 @@ function setupSolveButton(
                         container.classList.add('keyboard-focus');
                     }
                 });
+
+                // Automatically select the first solution
+                if (solutionContainers.length > 0) {
+                    const firstSolution = solutionContainers[0] as HTMLElement;
+                    toggleRouteSelection(firstSolution);
+                }
             })
             .catch(error => {
                 console.error('Error loading TSP model or solving:', error);
