@@ -1,4 +1,3 @@
-```markdown
 - [ ] Color scale markers for readability
 - [ ] Hover-over arc details (speed, duration, city pair)
 - [ ] Improve UI text for clarity
@@ -15,4 +14,3 @@
 - [ ] sort out liscenses / linking to sources
   - [ ] link to minizinc problem github
   - [ ] add all liscences
-```
