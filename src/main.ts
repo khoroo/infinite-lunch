@@ -625,10 +625,10 @@ function setupSolveButton(
                 });
 
                 // Automatically select the first solution
-                if (solutionContainers.length > 0) {
-                    const firstSolution = solutionContainers[0] as HTMLElement;
-                    toggleRouteSelection(firstSolution);
-                }
+                // if (solutionContainers.length > 0) {
+                //     const firstSolution = solutionContainers[0] as HTMLElement;
+                //     toggleRouteSelection(firstSolution);
+                // }
                 
                 // Add the back to map button after solutions are displayed
                 addBackToMapButton(routeContainer);
