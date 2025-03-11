@@ -971,6 +971,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 scaleLabels.innerHTML = '';
             }
             clearArcs();
+            mapService.clearCityMarkers();
+            state.selectedCities.forEach((city, index) => {
+                mapService.addCityMarker(city, index);
+            });
         }
     });
 });
