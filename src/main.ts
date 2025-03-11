@@ -515,7 +515,6 @@ function parseSolution(solution: any, modelData: ModelData, cities: City[], velo
             }
         });
     }
-    console.log("Visitation order:", visitationOrder);
     state = { ...state, visitationOrder };
     const resultHtml = generateRouteHtml(route);
     return `<div class="solution-container">${resultHtml}</div>`;
@@ -953,7 +952,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Draw the route arcs using the updated velocity range
             drawRouteArcs(routeData);
             // NEW: Update the map markers to show numbered labels following the visitation order
-            console.log("Updating markers with visitation order:", state.visitationOrder);
             mapService.updateCityMarkersWithLabels(state.visitationOrder);
         } else {
             // Clear state and UI when no route is selected
