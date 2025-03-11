@@ -632,15 +632,9 @@ function createModelData(
 // --- Solution Parsing ---
 function generateRouteHtml(route: RouteLeg[]): string {
     const totalDurationMinutes = route.reduce((acc, leg) => {
-        const durationParts = leg.duration.split(' ');
-        let legDurationMinutes = 0;
-        durationParts.forEach(part => {
-            if (part.includes('hrs')) {
-                legDurationMinutes += parseInt(part) * 60;
-            } else if (part.includes('mins')) {
-                legDurationMinutes += parseInt(part);
-            }
-        });
+        // Parse the duration string (HH:MM) into minutes
+        const [hours, minutes] = leg.duration.split(':').map(Number);
+        const legDurationMinutes = hours * 60 + minutes;
         return acc + legDurationMinutes;
     }, 0);
 
@@ -653,7 +647,7 @@ function generateRouteHtml(route: RouteLeg[]): string {
             <td>${leg.from}</td>
             <td>${leg.to}</td>
             <td>${leg.duration}</td>
-            <td>${leg.velocity} km/h</td>
+            <td>${leg.velocity}</td>
         </tr>
     `).join('');
 
@@ -664,7 +658,7 @@ function generateRouteHtml(route: RouteLeg[]): string {
                     <th>From</th>
                     <th>To</th>
                     <th>Duration</th>
-                    <th>Velocity</th>
+                    <th>Velocity (km/h)</th>
                 </tr>
                 ${routeRows}
                 <tr class="total-row">
@@ -700,15 +694,31 @@ function parseSolution(solution: any, modelData: ModelData, cities: City[], velo
             const remainingMinutes = durationMinutes % 60;
             const durationString = `${durationHours}hrs ${remainingMinutes}mins`;
 
-            const velocity = velocityMatrix[currentCityIndex][nextCityIndex];
-
-            route.push({ from: cities[currentCityIndex].name, to: cities[nextCityIndex].name, duration: durationString, velocity: velocity });
+            route.push({ from: cities[currentCityIndex].name, to: cities[nextCityIndex].name, duration: durationString, velocity: velocityMatrix[currentCityIndex][nextCityIndex] });
             currentCityIndex = nextCityIndex;
         } else {
             console.warn("No outgoing edge found from city", currentCityIndex + 1);
             break;
         }
     }
+
+    // Format durations as HH:MM
+    route = route.map(leg => {
+        const durationParts = leg.duration.split(' ');
+        let legDurationMinutes = 0;
+        durationParts.forEach(part => {
+            if (part.includes('hrs')) {
+                legDurationMinutes += parseInt(part) * 60;
+            } else if (part.includes('mins')) {
+                legDurationMinutes += parseInt(part);
+            }
+        });
+
+        const hours = Math.floor(legDurationMinutes / 60);
+        const minutes = legDurationMinutes % 60;
+        const formattedDuration = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        return { ...leg, duration: formattedDuration };
+    });
 
     const resultHtml = generateRouteHtml(route);
     return `<div class="solution-container">${resultHtml}</div>`;
