@@ -6,59 +6,65 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="./favicon.ico" />
   <title>Infinite Lunch</title>
-  <script type="module" crossorigin src="https://robert.sparks.me.uk/infinite-lunch/assets/index-3ga5m2IW.js"></script>
-  <link rel="stylesheet" crossorigin href="https://robert.sparks.me.uk/infinite-lunch/assets/index-D3SPqncT.css">
+  <script type="module" crossorigin src="https://robert.sparks.me.uk/infinite-lunch/assets/index-CsrGCRNY.js"></script>
+  <link rel="stylesheet" crossorigin href="https://robert.sparks.me.uk/infinite-lunch/assets/index-Dglc-S6b.css">
 </head>
 
 <body>
-  <h1>Infinite Lunch</h1>
-  <div id="map"></div>
-  <div class="color-scale-container">
-    <div id="color-scale" class="color-scale"></div>
-    <div class="color-scale-labels"></div>
+  <div class="scroll-container">
+    <h1>Infinite Lunch</h1>
+    <div id="map"></div>
+    <div class="color-scale-container">
+      <div id="color-scale" class="color-scale"></div>
+      <div class="color-scale-labels"></div>
+    </div>
+    <!-- Wrap velocity table in a scrollable container -->
+    <div class="velocity-table-wrapper">
+      <table class="velocity-presets-table">
+        <tr>
+          <th></th>
+          <th>Preset</th>
+          <th>Min</th>
+          <th>Max</th>
+        </tr>
+        <tr>
+          <td><input type="radio" name="velocityPreset" id="commercialPreset" value="commercial" checked></td>
+          <td><label for="commercialPreset">Commercial</label></td>
+          <td>500</td>
+          <td>900</td>
+        </tr>
+        <tr>
+          <td><input type="radio" name="velocityPreset" id="concordePreset" value="concorde"></td>
+          <td><label for="concordePreset">Concorde</label></td>
+          <td>500</td>
+          <td>2500</td>
+        </tr>
+        <tr>
+          <td><input type="radio" name="velocityPreset" id="extremePreset" value="extreme"></td>
+          <td><label for="extremePreset">Extreme</label></td>
+          <td>13</td>
+          <td>7200</td>
+        </tr>
+        <tr>
+          <td><input type="radio" name="velocityPreset" id="customPreset" value="custom"></td>
+          <td><label for="customPreset">Custom</label></td>
+          <td><input type="number" id="velocityMin" name="customvelocityMin" min="13" max="7200" value="13" disabled></td>
+          <td><input type="number" id="velocityMax" name="customvelocityMax" min="13" max="7200" value="7200" disabled></td>
+        </tr>
+      </table>
+    </div>
+    <div class="clock-container"></div>
+    <div class="city-picker-container">
+      <input type="text" class="city-search-input" placeholder="Search for cities...">
+      <div class="search-results"></div>
+      <div class="selected-cities"></div>
+    </div>
+    <div id="output"></div>
+    <!-- Moved solve button container to the bottom -->
+    <div class="solve-button-container">
+      <button id="solveButton">Solve</button>
+    </div>
   </div>
-  <table class="velocity-presets-table">
-    <tr>
-      <th></th>
-      <th>Preset Name</th>
-      <th>Min (km/h)</th>
-      <th>Max (km/h)</th>
-    </tr>
-    <tr>
-      <td><input type="radio" name="speedPreset" id="commercialPreset" value="commercial" checked></td>
-      <td><label for="commercialPreset">Commercial</label></td>
-      <td>500</td>
-      <td>900</td>
-    </tr>
-    <tr>
-      <td><input type="radio" name="speedPreset" id="concordePreset" value="concorde"></td>
-      <td><label for="concordePreset">Concorde</label></td>
-      <td>500</td>
-      <td>2500</td>
-    </tr>
-    <tr>
-      <td><input type="radio" name="speedPreset" id="extremePreset" value="extreme"></td>
-      <td><label for="extremePreset">Extreme</label></td>
-      <td>13</td>
-      <td>7200</td>
-    </tr>
-    <tr>
-      <td><input type="radio" name="speedPreset" id="customPreset" value="custom"></td>
-      <td><label for="customPreset">Custom</label></td>
-      <td><input type="number" id="speedMin" name="customSpeedMin" min="13" max="7200" value="13" disabled></td>
-      <td><input type="number" id="speedMax" name="customSpeedMax" min="13" max="7200" value="7200" disabled></td>
-    </tr>
-  </table>
-  <div class="clock-container"></div>
-  <div class="solve-button-container">
-    <button id="solveButton">Solve</button>
-  </div>
-  <div class="city-picker-container">
-    <input type="text" class="city-search-input" placeholder="Search for cities...">
-    <div class="search-results"></div>
-    <div class="selected-cities"></div>
-  </div>
-  <div id="output"></div>
 </body>
 
 </html>
