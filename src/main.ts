@@ -568,19 +568,21 @@ function generateRouteHtml(route: RouteLeg[]): string {
     `).join('');
 
     return `
-        <table class="route-table">
-            <tr>
-                <th>From</th>
-                <th>To</th>
-                <th>Duration</th>
-                <th>Velocity</th>
-            </tr>
-            ${routeRows}
-            <tr class="total-row">
-                <td colspan="2"><b>Total Duration</b></td>
-                <td colspan="2"><b>${totalDurationString}</b></td>
-            </tr>
-        </table>
+        <div class="route-table-wrapper">
+            <table class="route-table">
+                <tr>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Duration</th>
+                    <th>Velocity</th>
+                </tr>
+                ${routeRows}
+                <tr class="total-row">
+                    <td colspan="2"><b>Total Duration</b></td>
+                    <td colspan="2"><b>${totalDurationString}</b></td>
+                </tr>
+            </table>
+        </div>
     `;
 }
 
