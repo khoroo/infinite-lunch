@@ -4,7 +4,7 @@ A time-traveling route planner that lets you journey between cities while always
 
 ## About
 
-Infinite Lunch solves a unique variant of the Traveling Salesman Problem (TSP) where the goal is to visit a sequence of cities while always departing and arriving at the same local time. By leveraging time zone differences and setting speed constraints, you can create continuous loops where it's always the same time of day at each stop.
+Infinite Lunch solves a unique variant of the Traveling Salesman Problem (TSP) where the goal is to visit a sequence of cities while always departing and arriving at the same local time. By leveraging time zone differences and setting velocity constraints, you can create continuous loops where it's always the same time of day at each stop.
 
 ## Features
 
@@ -55,7 +55,7 @@ The application:
 2. Generates time matrices based on timezone differences
 3. Applies your specified time shift to create duration matrices
 4. Computes travel speeds between city pairs
-5. Filters connections based on minimum/maximum speed constraints
+5. Filters connections based on minimum/maximum velocity constraints
 6. Solves the TSP using a MiniZinc constraint programming model
 7. Returns optimal routes that maintain the same local time at arrival/departure
 

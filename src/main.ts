@@ -62,7 +62,7 @@ interface RouteLeg {
     from: string;
     to: string;
     duration: string;
-    speed: number;
+    velocity: number;
 }
 
 // --- State ---
@@ -505,10 +505,10 @@ function createModelData(
     for (let i = 0; i < n; i++) {
         for (let j = 0; j < n; j++) {
             if (i === j) continue;
-            const speed = speedMatrix[i][j];
-            if (speed >= speedMin && speed <= speedMax) {
+            const velocity = speedMatrix[i][j];
+            if (velocity >= speedMin && velocity <= speedMax) {
                 edges.push([i + 1, j + 1]);
-                costs.push(speed > 0 ? Math.round(durationMatrix[i][j]) : 0);
+                costs.push(velocity > 0 ? Math.round(durationMatrix[i][j]) : 0);
             }
         }
     }
@@ -540,7 +540,7 @@ function generateRouteHtml(route: RouteLeg[]): string {
             <td>${leg.from}</td>
             <td>${leg.to}</td>
             <td>${leg.duration}</td>
-            <td>${leg.speed} km/h</td>
+            <td>${leg.velocity} km/h</td>
         </tr>
     `).join('');
 
@@ -550,7 +550,7 @@ function generateRouteHtml(route: RouteLeg[]): string {
                 <th>From</th>
                 <th>To</th>
                 <th>Duration</th>
-                <th>Speed</th>
+                <th>Velocity</th>
             </tr>
             ${routeRows}
             <tr class="total-row">
@@ -585,9 +585,9 @@ function parseSolution(solution: any, modelData: ModelData, cities: City[], spee
             const remainingMinutes = durationMinutes % 60;
             const durationString = `${durationHours}hrs ${remainingMinutes}mins`;
 
-            const speed = speedMatrix[currentCityIndex][nextCityIndex];
+            const velocity = speedMatrix[currentCityIndex][nextCityIndex];
 
-            route.push({ from: cities[currentCityIndex].name, to: cities[nextCityIndex].name, duration: durationString, speed: speed });
+            route.push({ from: cities[currentCityIndex].name, to: cities[nextCityIndex].name, duration: durationString, velocity: velocity });
             currentCityIndex = nextCityIndex;
         } else {
             console.warn("No outgoing edge found from city", currentCityIndex + 1);
@@ -753,7 +753,7 @@ function updateColorScale(min: number, max: number): void {
     labelsContainer.appendChild(maxLabel);
 }
 
-// --- Speed Preset Configuration ---
+// --- Velocity Preset Configuration ---
 const presets = {
   commercial: { min: 500, max: 900 },
   concorde: { min: 500, max: 2500 },
@@ -817,9 +817,9 @@ function setupSpeedPresets(): void {
       }
     });
     
-    console.log("Speed presets setup complete");
+    console.log("Velocity presets setup complete");
   } catch (error) {
-    console.error("Failed to set up speed presets:", error);
+    console.error("Failed to set up velocity presets:", error);
   }
 }
 
