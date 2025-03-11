@@ -100,14 +100,25 @@ function setupMap(): void {
             ],
             view: new View({
                 center: [0, 0],
-                zoom: 2,
+                zoom: 1,
+                constrainResolution: true
             }),
         });
 
-        // Ensure map container fits narrow screens
+        // Ensure map container maintains 2:1 ratio
         const mapEl = document.getElementById('map');
         if (mapEl) {
             mapEl.style.maxWidth = '100%';
+            
+            // Set initial height based on current width
+            const updateMapHeight = () => {
+                const width = mapEl.offsetWidth;
+                mapEl.style.height = `${width / 2}px`;
+            };
+            
+            // Update height initially and on resize
+            updateMapHeight();
+            window.addEventListener('resize', updateMapHeight);
         }
     } catch (error) {
         console.error("Failed to set up map:", error);
