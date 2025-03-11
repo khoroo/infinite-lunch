@@ -12,8 +12,10 @@
   <div class="scroll-container">
     <h1>Infinite Lunch</h1>
     <i>Imagine if lunch never ended</i>
-    <p>Legend has it that, in the 80s, red-blooded city types in London took a long "working" lunch, then jetted off to New York on the Concorde, arriving just in time for another lunch!</p>
-    <p>Consider New York and London as graph nodes, aiming to minimize total travel time while visiting all cities in an order that allows consecutive lunches—a classic traveling salesman problem.</p>
+    <p>Legend has it that, in the 80s, red-blooded city types in London took a long "working" lunch, then jetted off to
+      New York on the Concorde, arriving just in time for another lunch!</p>
+    <p>Consider New York and London as graph nodes, aiming to minimize total travel time while visiting all cities in an
+      order that allows consecutive lunches—a classic traveling salesman problem.</p>
     <div id="map"></div>
     <div class="color-scale-container">
       <div id="color-scale" class="color-scale"></div>
@@ -21,7 +23,9 @@
       <div class="color-scale-axis-label">velocity in km/h</div>
     </div>
     <!-- Wrap velocity table in a scrollable container -->
-    <p>The problem becomes easier or harder depending on how slow and fast we can fly. Use a (generous) preset of typical commercial aircraft, concorde and extreme - the slowest and fastest recorded velocities of a powered aircraft.</p>
+    <p>The problem becomes easier or harder depending on how slow and fast we can fly. Use a (generous) preset of
+      typical commercial aircraft, concorde and extreme - the slowest and fastest recorded velocities of a powered
+      aircraft.</p>
     <div class="velocity-table-wrapper">
       <table class="velocity-presets-table">
         <tr>
@@ -51,12 +55,15 @@
         <tr>
           <td><input type="radio" name="velocityPreset" id="customPreset" value="custom"></td>
           <td><label for="customPreset">Custom</label></td>
-          <td><input type="number" id="velocityMin" name="customvelocityMin" min="13" max="7200" value="13" disabled></td>
-          <td><input type="number" id="velocityMax" name="customvelocityMax" min="13" max="7200" value="7200" disabled></td>
+          <td><input type="number" id="velocityMin" name="customvelocityMin" min="13" max="7200" value="13" disabled>
+          </td>
+          <td><input type="number" id="velocityMax" name="customvelocityMax" min="13" max="7200" value="7200" disabled>
+          </td>
         </tr>
       </table>
     </div>
-    <p>The arrival and depature clocks are in local time, following from the example, the passangers would depart London at 2pm local time, and arrive in New York at 12pm local time.</p>
+    <p>The arrival and depature clocks are in local time, following from the example, the passangers would depart London
+      at 2pm local time, and arrive in New York at 12pm local time.</p>
     <div class="clock-container"></div>
     <div class="city-picker-container">
       <input type="text" class="city-search-input" placeholder="Search for cities...">

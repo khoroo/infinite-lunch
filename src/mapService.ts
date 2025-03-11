@@ -98,10 +98,10 @@ export function clearCityMarkers(): void {
 
 // Draw a great circle arc between two cities
 export function drawGreatCircleArc(
-    from: City, 
-    to: City, 
-    velocity: number = 0, 
-    velocityMin: number = 0, 
+    from: City,
+    to: City,
+    velocity: number = 0,
+    velocityMin: number = 0,
     velocityMax: number = 1
 ): Feature {
     try {
@@ -208,7 +208,7 @@ export function removeFeatures(features: Feature[]): void {
 export function drawRouteArcs(
     routeData: Array<{ from: string, to: string, velocity?: number }>,
     cities: City[],
-    velocityMin: number, 
+    velocityMin: number,
     velocityMax: number
 ): Feature[] {
     const arcs: Feature[] = [];
@@ -219,8 +219,8 @@ export function drawRouteArcs(
 
         if (fromCity && toCity) {
             const arcFeature = drawGreatCircleArc(
-                fromCity, 
-                toCity, 
+                fromCity,
+                toCity,
                 segment.velocity || 0,
                 velocityMin,
                 velocityMax
@@ -238,7 +238,7 @@ export function updateMapView(cities: City[]): void {
 
     const coordinates = cities.map(city => fromLonLat([city.longitude, city.latitude]));
     const extent = boundingExtent(coordinates);
-    
+
     if (map) {
         map.getView().fit(extent, { padding: [50, 50, 50, 50], duration: 1000 });
     }

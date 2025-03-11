@@ -29,11 +29,11 @@ function clearArcs(): void {
 
 function drawRouteArcs(routeData: Array<{ from: string, to: string, velocity?: number }>): void {
     clearArcs();
-    
+
     state.currentArcs = mapService.drawRouteArcs(
-        routeData, 
-        state.selectedCities, 
-        state.velocityMin, 
+        routeData,
+        state.selectedCities,
+        state.velocityMin,
         state.velocityMax
     );
 }
@@ -427,13 +427,13 @@ function addBackToMapButton(container: HTMLElement): void {
     if (existingButton) {
         existingButton.remove();
     }
-    
+
     // Create the button
-    const backButton = createElement('button', { 
-        className: 'back-to-map-button', 
-        textContent: 'Back to Map' 
+    const backButton = createElement('button', {
+        className: 'back-to-map-button',
+        textContent: 'Back to Map'
     });
-    
+
     // Add click handler to scroll back to the map
     backButton.addEventListener('click', () => {
         const mapElement = document.getElementById('map');
@@ -443,7 +443,7 @@ function addBackToMapButton(container: HTMLElement): void {
             mapElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     });
-    
+
     // Append to the container
     container.appendChild(backButton);
 }
@@ -505,43 +505,43 @@ function parseSolution(solution: any, modelData: ModelData, cities: City[], velo
 // Add this new function to convert solver status to user-friendly message with styling
 function formatSolverStatus(status: string): string {
     const statusMessages: Record<string, { message: string, className: string }> = {
-        'OPTIMAL_SOLUTION': { 
-            message: 'Optimal solution found', 
-            className: 'status-success' 
+        'OPTIMAL_SOLUTION': {
+            message: 'Optimal solution found',
+            className: 'status-success'
         },
-        'SATISFIED': { 
-            message: 'Solution found', 
-            className: 'status-success' 
+        'SATISFIED': {
+            message: 'Solution found',
+            className: 'status-success'
         },
-        'UNSATISFIABLE': { 
-            message: 'No solution exists with current constraints', 
-            className: 'status-error' 
+        'UNSATISFIABLE': {
+            message: 'No solution exists with current constraints',
+            className: 'status-error'
         },
-        'UNKNOWN': { 
-            message: 'Could not determine if a solution exists', 
-            className: 'status-warning' 
+        'UNKNOWN': {
+            message: 'Could not determine if a solution exists',
+            className: 'status-warning'
         },
-        'ERROR': { 
-            message: 'An error occurred while solving', 
-            className: 'status-error' 
+        'ERROR': {
+            message: 'An error occurred while solving',
+            className: 'status-error'
         },
-        'UNBOUNDED': { 
-            message: 'Problem is unbounded', 
-            className: 'status-warning' 
+        'UNBOUNDED': {
+            message: 'Problem is unbounded',
+            className: 'status-warning'
         },
-        'UNSAT_OR_UNBOUNDED': { 
-            message: 'Problem is unsatisfiable or unbounded', 
-            className: 'status-warning' 
+        'UNSAT_OR_UNBOUNDED': {
+            message: 'Problem is unsatisfiable or unbounded',
+            className: 'status-warning'
         }
     };
 
-    const defaultStatus = { 
-        message: `Solver status: ${status}`, 
-        className: 'status-info' 
+    const defaultStatus = {
+        message: `Solver status: ${status}`,
+        className: 'status-info'
     };
-    
+
     const result = statusMessages[status] || defaultStatus;
-    
+
     return `<div class="solver-status ${result.className}">${result.message}</div>`;
 }
 
@@ -672,7 +672,7 @@ function setupSolveButton(
                 //     const firstSolution = solutionContainers[0] as HTMLElement;
                 //     toggleRouteSelection(firstSolution);
                 // }
-                
+
                 // Add the back to map button after solutions are displayed
                 addBackToMapButton(routeContainer);
             })

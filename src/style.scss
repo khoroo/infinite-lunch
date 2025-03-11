@@ -196,7 +196,7 @@ table {
     padding-bottom: 50%;
     position: relative;
 
-    & > * {
+    &>* {
       position: absolute;
       top: 0;
       left: 0;
@@ -839,6 +839,7 @@ table {
 
         &[for="commercialPreset"] {
           font-size: 0;
+
           &::after {
             content: 'Comm.';
             display: block;
@@ -848,6 +849,7 @@ table {
 
         &[for="concordePreset"] {
           font-size: 0;
+
           &::after {
             content: 'Conc.';
             display: block;
@@ -857,6 +859,7 @@ table {
 
         &[for="extremePreset"] {
           font-size: 0;
+
           &::after {
             content: 'Extr.';
             display: block;
@@ -866,6 +869,7 @@ table {
 
         &[for="customPreset"] {
           font-size: 0;
+
           &::after {
             content: 'Cust.';
             display: block;
@@ -911,6 +915,7 @@ table {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .solution-container,
   #solveButton {
     transition: none;
