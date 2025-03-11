@@ -1,22 +1,12 @@
 import './style.scss';
-import { Map as OLMap, View } from 'ol';
-import TileLayer from 'ol/layer/Tile';
-import OSM from 'ol/source/OSM';
 import Fuse, { FuseResult } from 'fuse.js';
 import Feature from 'ol/Feature';
-import Point from 'ol/geom/Point';
-import VectorSource from 'ol/source/Vector';
-import VectorLayer from 'ol/layer/Vector';
-import { Circle, Style, Fill, Stroke, Text } from 'ol/style';
-import { fromLonLat } from 'ol/proj';
-import LineString from 'ol/geom/LineString';
-import * as arcjs from 'arc';
 import { Model } from 'https://cdn.jsdelivr.net/npm/minizinc/dist/minizinc.mjs';
 import LatLon from 'geodesy/latlon-ellipsoidal-vincenty.js';
 import { DateTime } from 'luxon';
 import './clock';
-import { boundingExtent } from 'ol/extent';
-import { City, ArcCoordinates, ModelData, RouteLeg } from './types';
+import { City, ModelData, RouteLeg } from './types';
+import * as mapService from './mapService';
 
 // --- State ---
 const state = {
@@ -24,220 +14,28 @@ const state = {
     fuse: null as Fuse<City> | null,
     selectedCities: [] as City[],
     selectedSearchIndex: 0,
-    selectedRouteIndex: 0, // New state to track selected route
+    selectedRouteIndex: 0,
     velocityMin: 0,
     velocityMax: 0,
     currentArcs: [] as Feature[],
     currentRoute: [] as Array<{ from: string, to: string, velocity: number }>
 };
 
-// --- Map ---
-let vectorSource: VectorSource;
-let vectorLayer: VectorLayer;
-
-function setupMap(): void {
-    try {
-        vectorSource = new VectorSource({
-            features: [],
-        });
-
-        vectorLayer = new VectorLayer({
-            source: vectorSource,
-        });
-
-        new OLMap({
-            target: 'map',
-            layers: [
-                new TileLayer({
-                    source: new OSM(),
-                }),
-                vectorLayer,
-            ],
-            view: new View({
-                center: [0, 0],
-                zoom: 1,
-                constrainResolution: true
-            }),
-        });
-
-        // Ensure map container maintains 2:1 ratio
-        const mapEl = document.getElementById('map');
-        if (mapEl) {
-            mapEl.style.maxWidth = '100%';
-
-            // Set initial height based on current width
-            const updateMapHeight = () => {
-                const width = mapEl.offsetWidth;
-                mapEl.style.height = `${width / 2}px`;
-            };
-
-            // Update height initially and on resize
-            updateMapHeight();
-            window.addEventListener('resize', updateMapHeight);
-        }
-    } catch (error) {
-        console.error("Failed to set up map:", error);
-    }
-}
-
-function addCityMarker(city: City, index: number): void {
-    const iconStyle = new Style({
-        image: new Circle({
-            radius: 14,
-            fill: new Fill({ color: 'rgba(0, 153, 255, 0.6)' }),
-            stroke: new Stroke({ color: '#fff', width: 2 }),
-        }),
-        text: new Text({
-            text: String(index + 1),
-            fill: new Fill({ color: '#fff' }),
-            font: '12px sans-serif',
-            textAlign: 'center',
-            textBaseline: 'middle',
-        }),
-    });
-
-    const cityFeature = new Feature({
-        geometry: new Point(fromLonLat([city.longitude, city.latitude])),
-    });
-
-    cityFeature.setStyle(iconStyle);
-    vectorSource.addFeature(cityFeature);
-
-    updateMapView();
-}
-
-function clearCityMarkers(): void {
-    vectorSource.clear();
-}
-
-// --- Great Circle Arcs ---
-function drawGreatCircleArc(from: City, to: City): Feature {
-    try {
-        // Look up the velocity between these cities in the current route
-        const fromCityName = from.name;
-        const toCityName = to.name;
-
-        // Get velocity from the selected route for this segment
-        let velocity = 0;
-        if (state.currentRoute && state.currentRoute.length > 0) {
-            const segment = state.currentRoute.find(
-                seg => seg.from === fromCityName && seg.to === toCityName
-            );
-            if (segment) {
-                velocity = segment.velocity;
-            }
-        }
-
-        // Normalize velocity based on route's velocity range
-        let normalizedValue = 0.5; // default mid-point if no range
-        if (state.velocityMax !== state.velocityMin) {
-            normalizedValue = (velocity - state.velocityMin) / (state.velocityMax - state.velocityMin);
-            normalizedValue = Math.max(0, Math.min(1, normalizedValue));
-        }
-
-        const arcColor = getViridisColor(normalizedValue);
-        const arcGenerator = new arcjs.GreatCircle(
-            { x: from.longitude, y: from.latitude },
-            { x: to.longitude, y: to.latitude }
-        );
-
-        const arcLine = arcGenerator.Arc(100);
-        const features: Feature[] = [];
-
-        arcLine.geometries.forEach(geometry => {
-            const lineCoords = geometry.coords.map(coord => fromLonLat([coord[0], coord[1]]));
-
-            const lineFeature = new Feature({
-                geometry: new LineString(lineCoords)
-            });
-
-            // Create the main line style
-            const lineStyle = new Style({
-                stroke: new Stroke({
-                    color: arcColor,
-                    width: 3
-                })
-            });
-
-            lineFeature.setStyle([lineStyle]);
-
-            vectorSource.addFeature(lineFeature);
-            features.push(lineFeature);
-        });
-
-        return features[0] || new Feature();
-    } catch (error) {
-        console.error("Error drawing great circle arc:", error);
-
-        const arcPoints = calculateGreatCircleArc(from, to);
-        const lineCoordinates = arcPoints.map(point => fromLonLat([point.lon, point.lat]));
-
-        const lineFeature = new Feature({
-            geometry: new LineString(lineCoordinates)
-        });
-
-        // Create the main line style
-        const lineStyle = new Style({
-            stroke: new Stroke({
-                color: '#ff0000',
-                width: 3
-            })
-        });
-
-        lineFeature.setStyle([lineStyle]);
-
-        vectorSource.addFeature(lineFeature);
-        return lineFeature;
-    }
-}
-
-function calculateGreatCircleArc(from: City, to: City, numPoints: number = 100): ArcCoordinates[] {
-    const points: ArcCoordinates[] = [];
-
-    const lat1 = from.latitude * Math.PI / 180;
-    const lon1 = from.longitude * Math.PI / 180;
-    const lat2 = to.latitude * Math.PI / 180;
-    const lon2 = to.longitude * Math.PI / 180;
-
-    for (let i = 0; i <= numPoints; i++) {
-        const f = i / numPoints;
-
-        const A = Math.sin((1 - f) * Math.PI) / Math.sin(Math.PI);
-        const B = Math.sin(f * Math.PI) / Math.sin(Math.PI);
-
-        const x = A * Math.cos(lat1) * Math.cos(lon1) + B * Math.cos(lat2) * Math.cos(lon2);
-        const y = A * Math.cos(lat1) * Math.sin(lon1) + B * Math.cos(lat2) * Math.sin(lon2);
-        const z = A * Math.sin(lat1) + B * Math.sin(lat2);
-
-        const lat = Math.atan2(z, Math.sqrt(x * x + y * y));
-        const lon = Math.atan2(y, x);
-
-        points.push({
-            lat: lat * 180 / Math.PI,
-            lon: lon * 180 / Math.PI
-        });
-    }
-
-    return points;
-}
-
+// --- Map Integration Functions ---
 function clearArcs(): void {
-    state.currentArcs.forEach(feature => vectorSource.removeFeature(feature));
+    mapService.removeFeatures(state.currentArcs);
     state.currentArcs = [];
 }
 
 function drawRouteArcs(routeData: Array<{ from: string, to: string, velocity?: number }>): void {
     clearArcs();
-
-    routeData.forEach(segment => {
-        const fromCity = state.selectedCities.find(city => city.name === segment.from);
-        const toCity = state.selectedCities.find(city => city.name === segment.to);
-
-        if (fromCity && toCity) {
-            const arcFeature = drawGreatCircleArc(fromCity, toCity);
-            state.currentArcs.push(arcFeature);
-        }
-    });
+    
+    state.currentArcs = mapService.drawRouteArcs(
+        routeData, 
+        state.selectedCities, 
+        state.velocityMin, 
+        state.velocityMax
+    );
 }
 
 // --- City Selection ---
@@ -268,7 +66,7 @@ function removeCity(city: City): void {
         state.selectedCities.splice(index, 1);
         clearArcs();
         updateSelectedCitiesUI();
-        updateMapView();
+        mapService.updateMapView(state.selectedCities);
     }
 }
 
@@ -502,9 +300,9 @@ function updateSelectedCitiesUI(): void {
     table.appendChild(tbody);
     container.appendChild(table);
 
-    clearCityMarkers();
+    mapService.clearCityMarkers();
     state.selectedCities.forEach((city, index) => {
-        addCityMarker(city, index);
+        mapService.addCityMarker(city, index);
     });
 }
 
@@ -965,30 +763,6 @@ function createElement<K extends keyof HTMLElementTagNameMap>(
     return element;
 }
 
-function getViridisColor(value: number): string {
-    value = Math.max(0, Math.min(1, value));
-
-    const colors = [
-        [13, 8, 135],
-        [85, 0, 170],
-        [156, 23, 158],
-        [205, 62, 78],
-        [246, 147, 34],
-        [252, 225, 56]
-    ];
-
-    const numColors = colors.length - 1;
-    const idx = value * numColors;
-    const idx1 = Math.floor(idx);
-    const idx2 = Math.min(idx1 + 1, numColors);
-    const fract = idx - idx1;
-
-    const r = Math.round(colors[idx1][0] + fract * (colors[idx2][0] - colors[idx1][0]));
-    const g = Math.round(colors[idx1][1] + fract * (colors[idx2][1] - colors[idx1][1]));
-    const b = Math.round(colors[idx1][2] + fract * (colors[idx2][2] - colors[idx1][2]));
-
-    return `rgb(${r}, ${g}, ${b})`;
-}
 
 function parseRouteFromHtml(htmlContent: string): Array<{ from: string, to: string, velocity: number }> {
     const route: Array<{ from: string, to: string, velocity: number }> = [];
@@ -1053,24 +827,13 @@ function loadCities(): Promise<City[]> {
         });
 }
 
-function updateMapView(): void {
-    if (state.selectedCities.length === 0) return;
-
-    const coordinates = state.selectedCities.map(city => fromLonLat([city.longitude, city.latitude]));
-    const extent = boundingExtent(coordinates);
-    const map = vectorLayer.get('map'); // Corrected method to get the map instance
-    if (map != null) {  // now checking explicitly
-        map.getView().fit(extent, { padding: [50, 50, 50, 50], duration: 1000 });
-    }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     initialize();
     setupSolveButton(state);
     setupSearchUI();
-    setupvelocityPresets(); // Replace setupvelocityMinInput, setupvelocityMaxInput, and setupPresetButtons
-    setupMap();
-    setupRouteKeyboardNavigation(); // Add this new function call
+    setupvelocityPresets();
+    mapService.setupMap();
+    setupRouteKeyboardNavigation();
 
     document.addEventListener('solution-click', (event: Event) => {
         const customEvent = event as CustomEvent;
