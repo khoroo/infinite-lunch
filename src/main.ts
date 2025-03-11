@@ -939,7 +939,6 @@ function parseRouteFromHtml(htmlContent: string): Array<{ from: string, to: stri
         }
     }
 
-    console.log("Parsed route:", route);
     return route;
 }
 
@@ -992,16 +991,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('solution-click', (event: Event) => {
         const customEvent = event as CustomEvent;
-        console.log("Solution click event received:", customEvent.detail);
 
         const isSelected = customEvent.detail.isSelected;
 
         if (isSelected) {
             const routeData = parseRouteFromHtml(customEvent.detail.html);
-            console.log("Drawing route arcs for:", routeData);
             drawRouteArcs(routeData);
         } else {
-            console.log("Clearing arcs");
             clearArcs();
         }
     });
