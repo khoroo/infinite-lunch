@@ -10,7 +10,8 @@
   },
   "devDependencies": {
     "typescript": "^5.8.2",
-    "vite": "^6.2.0"
+    "vite": "^6.2.0",
+    "sass": "^1.71.1"
   },
   "dependencies": {
     "arc": "^0.1.4",
