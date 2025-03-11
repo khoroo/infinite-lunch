@@ -24,6 +24,65 @@ let state = {
     exampleHintHidden: localStorage.getItem('exampleHintHidden') === 'true'
 };
 
+// --- URL Parameter Handling ---
+// Parse URL query parameters
+function parseUrlParams(): Map<string, string> {
+    const params = new Map<string, string>();
+    const queryString = window.location.search.substring(1);
+    
+    if (queryString) {
+        const pairs = queryString.split('&');
+        for (const pair of pairs) {
+            const [key, value] = pair.split('=');
+            params.set(decodeURIComponent(key), decodeURIComponent(value));
+        }
+    }
+    
+    return params;
+}
+
+// Select cities by their indices in the cities array
+function selectCitiesByIndices(indices: number[]): void {
+    indices.forEach(index => {
+        if (index >= 0 && index < state.cities.length) {
+            const city = state.cities[index];
+            if (!isCitySelected(city)) {
+                // Use direct addition to avoid recursive URL updates
+                state.selectedCities.push(city);
+                console.log(`Selected city ${city.name} (${city.country_code}) at index ${index} from URL parameter`);
+            }
+        } else {
+            console.warn(`Invalid city index in URL: ${index}`);
+        }
+    });
+    
+    // Only update UI once after all cities are selected
+    if (indices.length > 0) {
+        updateSelectedCitiesUI();
+        mapService.updateMapView(state.selectedCities);
+    }
+}
+
+// Update URL with current selected city indices
+function updateUrlWithSelectedCities(): void {
+    const cityIndices = state.selectedCities.map(selectedCity => 
+        state.cities.findIndex(city => 
+            city.name === selectedCity.name && city.country_code === selectedCity.country_code
+        )
+    ).filter(index => index !== -1);
+    
+    // Create a URL that works across different deployments
+    const url = new URL(window.location.href);
+    
+    if (cityIndices.length > 0) {
+        url.searchParams.set('cities', cityIndices.join(','));
+    } else {
+        url.searchParams.delete('cities');
+    }
+    
+    window.history.replaceState({}, '', url.toString());
+}
+
 // --- Map Integration Functions ---
 function clearArcs(): void {
     mapService.removeFeatures(state.currentArcs);
@@ -44,8 +103,17 @@ function drawRouteArcs(routeData: Array<{ from: string, to: string, velocity?: n
 // --- City Selection ---
 function selectCity(city: City): void {
     if (!isCitySelected(city)) {
+        // Find the index of this city in the original cities array
+        const cityIndex = state.cities.findIndex(c => 
+            c.name === city.name && c.country_code === city.country_code);
+        
+        console.log(`Adding city ${city.name} (${city.country_code}) at index ${cityIndex} in cities.json`);
+        
         state.selectedCities.push(city);
         updateSelectedCitiesUI();
+        
+        // Update URL with the new selection
+        updateUrlWithSelectedCities();
 
         // Scroll to the selected cities container
         const selectedCitiesContainer = document.querySelector('.selected-cities');
@@ -78,6 +146,9 @@ function removeCity(city: City): void {
         clearArcs();
         updateSelectedCitiesUI();
         mapService.updateMapView(state.selectedCities);
+        
+        // Update URL after removing a city
+        updateUrlWithSelectedCities();
     }
 }
 
@@ -991,6 +1062,18 @@ function loadCities(): Promise<City[]> {
                 }
             });
             console.log(`Loaded ${state.cities.length} cities`);
+            
+            // Check for city indices in URL after cities are loaded
+            const params = parseUrlParams();
+            if (params.has('cities')) {
+                const cityIndices = params.get('cities')!
+                    .split(',')
+                    .map(index => parseInt(index.trim(), 10))
+                    .filter(index => !isNaN(index));
+                
+                selectCitiesByIndices(cityIndices);
+            }
+            
             return data;
         });
 }
