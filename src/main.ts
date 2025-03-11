@@ -259,6 +259,12 @@ function selectCity(city: City): void {
     if (!isCitySelected(city)) {
         state.selectedCities.push(city);
         updateSelectedCitiesUI();
+        
+        // Scroll to the selected cities container
+        const selectedCitiesContainer = document.querySelector('.selected-cities');
+        if (selectedCitiesContainer) {
+            selectedCitiesContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
     }
 
     clearSearch();
