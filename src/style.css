@@ -44,7 +44,7 @@ html, body {
 
 body {
   min-height: 100vh;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: "Nimbus Sans", Helvetica, Arial, sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
