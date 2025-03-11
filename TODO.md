@@ -1,9 +1,8 @@
-- Color scale markers for readability
 - Hover-over arc details (velocity, duration, city pair)
-- Explore background color options
 - add a toggle for second hand animation
 - add alt text / make sure keyboard accessible
 - refactor massive main.ts into a few coarse files
+  - come up with better pattern for handling state so we can just pass it around immutably
 - add options to solve for different things (lowest velocity)
 - pre warn if edge graph not connected enough to solve
   - state what edges are failing

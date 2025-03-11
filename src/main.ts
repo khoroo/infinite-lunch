@@ -421,6 +421,33 @@ function generateRouteHtml(route: RouteLeg[]): string {
     `;
 }
 
+function addBackToMapButton(container: HTMLElement): void {
+    // Remove any existing back-to-map button first
+    const existingButton = container.querySelector('.back-to-map-button');
+    if (existingButton) {
+        existingButton.remove();
+    }
+    
+    // Create the button
+    const backButton = createElement('button', { 
+        className: 'back-to-map-button', 
+        textContent: 'Back to Map' 
+    });
+    
+    // Add click handler to scroll back to the map
+    backButton.addEventListener('click', () => {
+        const mapElement = document.getElementById('map');
+        if (mapElement) {
+            // Scroll to center the map in the viewport instead of aligning to the top
+            // This will effectively show more content above the map
+            mapElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    });
+    
+    // Append to the container
+    container.appendChild(backButton);
+}
+
 function parseSolution(solution: any, modelData: ModelData, cities: City[], velocityMatrix: number[][]): string {
     const { x } = solution.output.json;
     const edges = modelData.E;
@@ -602,6 +629,9 @@ function setupSolveButton(
                     const firstSolution = solutionContainers[0] as HTMLElement;
                     toggleRouteSelection(firstSolution);
                 }
+                
+                // Add the back to map button after solutions are displayed
+                addBackToMapButton(routeContainer);
             })
             .catch(error => {
                 console.error('Error loading TSP model or solving:', error);
