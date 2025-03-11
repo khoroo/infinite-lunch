@@ -1,8 +1,9 @@
+// Import OpenLayers CSS
 @import "/node_modules/ol/ol.css";
 
+// Define custom properties in :root
 :root {
   --main-max-width: min(900px, 95%);
-  /* Changed from 1200px to 900px */
   --clock-size: clamp(120px, 30vw, 200px);
   --mobile-breakpoint: 768px;
   --narrow-breakpoint: 400px;
@@ -21,21 +22,10 @@
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --table-padding-x: 0.5rem;
-  /* New variable for horizontal table padding */
   --table-padding-y: 0.5rem;
-  /* New variable for vertical table padding */
 }
 
-/* Add styles for paragraphs to limit width */
-p {
-  /* max-width: var(); */
-  margin-left: 0;
-  /* Left align paragraphs instead of centering */
-  margin-right: 0;
-  line-height: 1.5;
-}
-
-/* Reset and base styles */
+// Base styles
 html {
   box-sizing: border-box;
   scroll-behavior: smooth;
@@ -54,7 +44,6 @@ body {
   padding: 0;
   width: 100%;
   height: 100%;
-  /* Ensure both scroll directions work properly */
   overflow-x: visible;
   overflow-y: visible;
 }
@@ -67,16 +56,17 @@ body {
   align-items: center;
   padding: var(--spacing-md);
   padding-bottom: 3rem;
-  width: 100%;
-  /* Remove any overflow restrictions */
-  /* overflow-x: hidden; */
   max-width: var(--main-max-width);
   margin: 0 auto;
   position: relative;
-  /* Ensure proper stacking context */
 }
 
-/* Main content container */
+p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+// Main content container
 .main-content {
   width: 100%;
   max-width: var(--main-max-width);
@@ -85,7 +75,7 @@ body {
   gap: var(--spacing-lg);
 }
 
-/* Interactive elements */
+// Interactive elements
 button {
   touch-action: manipulation;
   cursor: pointer;
@@ -101,17 +91,13 @@ button {
   font-weight: bold;
   transition: background-color 0.3s ease;
   width: 80%;
-  /* Make the solve button narrower */
   max-width: 300px;
-  /* Limit maximum width */
   margin: 0 auto;
-  /* Center the solve button */
   display: block;
-  /* Ensure margin auto works correctly */
-}
 
-#solveButton:hover {
-  background-color: var(--color-primary-hover);
+  &:hover {
+    background-color: var(--color-primary-hover);
+  }
 }
 
 #output {
@@ -120,75 +106,72 @@ button {
   width: 100%;
 }
 
-/* City picker styles */
+// City picker styles
 .city-picker-container {
   width: 100%;
   max-width: 100%;
-  margin-bottom: var(--spacing-lg);
-  margin-top: var(--spacing-lg);
+  margin: var(--spacing-lg) 0;
   position: relative;
+
+  .city-search-input {
+    width: 80%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    margin: 0 auto var(--spacing-sm);
+    display: block;
+  }
+
+  .search-results {
+    border: 1px solid var(--color-border);
+    max-height: min(300px, 60vh);
+    overflow-y: auto;
+    position: absolute;
+    background: var(--color-background);
+    z-index: 1000;
+    width: 100%;
+    left: 0;
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      padding: var(--spacing-sm) var(--spacing-md);
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+
+      &:hover,
+      &.selected {
+        background-color: var(--color-selected);
+      }
+    }
+  }
+
+  .selected-cities {
+    li {
+      margin-bottom: var(--spacing-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    button {
+      margin-left: var(--spacing-md);
+      padding: 0.25rem var(--spacing-sm);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      background: transparent;
+    }
+  }
 }
 
-.city-search-input {
-  width: 80%;
-  /* Changed from 100% to 80% to make narrower */
-  padding: 0.75rem;
-  font-size: 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--spacing-sm);
-  margin-left: auto;
-  /* Center the narrower input */
-  margin-right: auto;
-  display: block;
-}
-
-.search-results {
-  border: 1px solid var(--color-border);
-  max-height: min(300px, 60vh);
-  overflow-y: auto;
-  position: absolute;
-  background: var(--color-background);
-  z-index: 1000;
-  width: 100%;
-  left: 0;
-  border-radius: var(--radius-md);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.search-results ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.search-results li {
-  padding: var(--spacing-sm) var(--spacing-md);
-  cursor: pointer;
-  border-bottom: 1px solid #eee;
-}
-
-.search-results li:hover,
-.search-results li.selected {
-  background-color: var(--color-selected);
-}
-
-.selected-cities li {
-  margin-bottom: var(--spacing-sm);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.selected-cities button {
-  margin-left: var(--spacing-md);
-  padding: 0.25rem var(--spacing-sm);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: transparent;
-}
-
-/* Table styles */
+// General table styles
 table {
   border-collapse: collapse;
   width: 100%;
@@ -200,57 +183,46 @@ table {
   }
 }
 
-/* Map styling */
+// Map styling
 #map {
   width: 100%;
-  /* Remove the dynamic height as we'll set it programmatically */
-  /* height: clamp(300px, 60vh, 600px); */
   aspect-ratio: 2 / 1;
-  /* Fallback for browsers that support aspect-ratio */
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   margin: var(--spacing-md) 0;
-}
 
-/* For browsers that don't support aspect-ratio */
-@supports not (aspect-ratio: 2 / 1) {
-  #map {
+  @supports not (aspect-ratio: 2 / 1) {
     height: 0;
     padding-bottom: 50%;
-    /* 50% of width = 2:1 ratio */
     position: relative;
-  }
 
-  #map>* {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    & > * {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
   }
 }
 
-/* Route styling */
+// Route styling
 .route-container {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-md);
+  padding-bottom: calc(var(--spacing-md) * 1.5);
   margin-top: var(--spacing-lg);
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding-bottom: calc(var(--spacing-md) * 1.5);
-  /* Extra padding at bottom to prevent cutoff */
 }
 
 .route-table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: var(--spacing-sm);
-  /* Add bottom margin to prevent cutoff */
-  margin-top: var(--spacing-md);
+  margin: var(--spacing-md) 0 var(--spacing-sm);
   font-size: clamp(0.875rem, 2.5vw, 1rem);
 
   th,
@@ -280,42 +252,7 @@ table {
   }
 }
 
-/* Solution container */
-.solution-container {
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-md);
-  /* Use consistent padding on all sides */
-  margin: var(--spacing-sm) 0;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  overflow: hidden;
-  /* Prevent table from extending beyond container */
-  display: flex;
-  /* Use flex to contain the table */
-  flex-direction: column;
-  align-items: stretch;
-  /* Make child elements (table) fill the width */
-
-  /* Make the table take up the full width of the container with consistent margins */
-  .route-table,
-  .route-table-wrapper table {
-    width: 100%;
-    margin: var(--spacing-sm) 0;
-    /* Consistent margins top and bottom */
-  }
-
-  /* Fix for last table row */
-  .route-table tr:last-child td,
-  .route-table-wrapper table tr:last-child td {
-    border-bottom: 1px solid var(--color-border);
-    /* Ensure bottom border is visible */
-    padding-bottom: var(--table-padding-y);
-    /* Ensure consistent padding */
-  }
-}
-
-/* Additional rule to ensure table rows have consistent padding in all directions */
+// Additional route table rules
 .route-table td,
 .route-table th,
 .route-table-wrapper table td,
@@ -324,36 +261,58 @@ table {
   border: 1px solid var(--color-border);
 }
 
-/* Fix for the total row to ensure it's properly spaced */
 .route-table tr.total-row td,
 .route-table-wrapper table tr.total-row td {
   padding-bottom: var(--table-padding-y);
 }
 
-/* Style for keyboard focus on routes (distinct from selection) */
-.solution-container.keyboard-focus {
-  border: 2px solid #0078d7;
-  outline: none;
-}
+// Solution container
+.solution-container {
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  margin: var(--spacing-sm) 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 
-.solution-container:hover {
-  border-color: #aaa;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-}
+  &.keyboard-focus {
+    border: 2px solid #0078d7;
+    outline: none;
+  }
 
-.solution-container.selected {
-  border: 2px dashed black;
-  box-shadow: 0 0 8px rgba(0, 119, 204, 0.3);
-  background-color: rgba(240, 248, 255, 0.3);
-  /* Light highlight background */
+  &:hover {
+    border-color: #aaa;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  }
 
-  /* Emphasize the table in selected container */
-  .route-table {
-    background-color: white;
+  &.selected {
+    border: 2px dashed black;
+    box-shadow: 0 0 8px rgba(0, 119, 204, 0.3);
+    background-color: rgba(240, 248, 255, 0.3);
+
+    .route-table {
+      background-color: white;
+    }
+  }
+
+  .route-table,
+  .route-table-wrapper table {
+    width: 100%;
+    margin: var(--spacing-sm) 0;
+  }
+
+  .route-table tr:last-child td,
+  .route-table-wrapper table tr:last-child td {
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--table-padding-y);
   }
 }
 
-/* Solver status styles */
+// Solver status styles
 .solver-status {
   margin: var(--spacing-md) 0;
   padding: var(--spacing-md);
@@ -387,89 +346,152 @@ table {
   border: 1px solid #bee5eb;
 }
 
-/* Clock styles */
+// Clock styles
 .clock-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(var(--clock-size), 1fr));
   gap: var(--spacing-lg);
   width: 100%;
   justify-content: center;
-}
 
-.clock-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+  .clock-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
-.clock {
-  position: relative;
-  width: var(--clock-size);
-  height: var(--clock-size);
-  background-color: white;
-  border: 8px solid black;
-  border-radius: 50%;
-}
+    .clock {
+      position: relative;
+      width: var(--clock-size);
+      height: var(--clock-size);
+      background-color: white;
+      border: 8px solid black;
+      border-radius: 50%;
 
-.hour-marker {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
-}
+      .hour-marker {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
 
-.hour-marker div {
-  position: absolute;
-  width: clamp(4px, 1vw, 8px);
-  height: clamp(10px, 2.5vw, 20px);
-  background-color: black;
-  left: 50%;
-  top: 10px;
-  transform-origin: center 75%;
-  transform: translateX(-50%);
-  pointer-events: none;
-}
+        div {
+          position: absolute;
+          width: clamp(4px, 1vw, 8px);
+          height: clamp(10px, 2.5vw, 20px);
+          background-color: black;
+          left: 50%;
+          top: 10px;
+          transform-origin: center 75%;
+          transform: translateX(-50%);
+          pointer-events: none;
+        }
+      }
 
-.hand {
-  position: absolute;
-  bottom: 50%;
-  left: 50%;
-  transform-origin: bottom;
-  transform: translateX(-50%);
-  z-index: 2;
-}
+      .hand {
+        position: absolute;
+        bottom: 50%;
+        left: 50%;
+        transform-origin: bottom;
+        transform: translateX(-50%);
+        z-index: 2;
+      }
 
-.hour-hand {
-  width: clamp(4px, 1vw, 8px);
-  height: calc(var(--clock-size) * 0.3);
-  background-color: black;
-  z-index: 5;
-}
+      .hour-hand {
+        width: clamp(4px, 1vw, 8px);
+        height: calc(var(--clock-size) * 0.3);
+        background-color: black;
+        z-index: 5;
+      }
 
-.minute-hand {
-  width: clamp(3px, 0.75vw, 6px);
-  height: calc(var(--clock-size) * 0.425);
-  background-color: black;
-}
+      .minute-hand {
+        width: clamp(3px, 0.75vw, 6px);
+        height: calc(var(--clock-size) * 0.425);
+        background-color: black;
+      }
 
-.second-hand {
-  width: clamp(1px, 0.5vw, 2px);
-  height: calc(var(--clock-size) * 0.45);
-  background-color: red;
-  animation: rotate 60s linear infinite;
-}
+      .second-hand {
+        width: clamp(1px, 0.5vw, 2px);
+        height: calc(var(--clock-size) * 0.45);
+        background-color: red;
+        animation: rotate 60s linear infinite;
 
-.second-hand::after {
-  content: '';
-  position: absolute;
-  width: clamp(10px, 2.5vw, 20px);
-  height: clamp(10px, 2.5vw, 20px);
-  background-color: red;
-  border-radius: 50%;
-  top: calc(-1 * clamp(5px, 1.25vw, 10px));
-  left: 50%;
-  transform: translateX(-50%);
+        &::after {
+          content: '';
+          position: absolute;
+          width: clamp(10px, 2.5vw, 20px);
+          height: clamp(10px, 2.5vw, 20px);
+          background-color: red;
+          border-radius: 50%;
+          top: calc(-1 * clamp(5px, 1.25vw, 10px));
+          left: 50%;
+          transform: translateX(-50%);
+        }
+      }
+
+      .center-dot {
+        position: absolute;
+        width: clamp(6px, 1.5vw, 12px);
+        height: clamp(6px, 1.5vw, 12px);
+        background-color: black;
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 3;
+      }
+    }
+
+    .time-inputs {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: var(--spacing-sm);
+      margin-top: var(--spacing-md);
+      width: 100%;
+      max-width: var(--clock-size);
+      justify-content: center;
+
+      input {
+        width: 80px;
+        padding: 0.5rem;
+        font-size: 1rem;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-sm);
+        text-align: center;
+        font-family: "Nimbus Sans", Helvetica, Arial, sans-serif;
+
+        &[type="number"] {
+          -moz-appearance: textfield;
+          appearance: auto;
+
+          &::-webkit-outer-spin-button,
+          &::-webkit-inner-spin-button {
+            -webkit-appearance: auto;
+            margin: 0;
+          }
+        }
+      }
+
+      button {
+        width: auto;
+        min-width: 50px;
+        padding: 0.5rem;
+        font-size: 1rem;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-sm);
+        text-align: center;
+        flex-shrink: 0;
+        font-family: "Nimbus Sans", Helvetica, Arial, sans-serif;
+      }
+    }
+
+    .clock-label {
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin-bottom: var(--spacing-sm);
+      text-align: center;
+    }
+  }
 }
 
 @keyframes rotate {
@@ -478,174 +500,94 @@ table {
   }
 }
 
-.center-dot {
-  position: absolute;
-  width: clamp(6px, 1.5vw, 12px);
-  height: clamp(6px, 1.5vw, 12px);
-  background-color: black;
-  border-radius: 50%;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 3;
-}
-
-.time-inputs {
-  display: flex;
-  /* Change from grid to flex for horizontal layout */
-  flex-direction: row;
-  /* Ensure horizontal layout */
-  align-items: center;
-  /* Vertically center the elements */
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-md);
-  width: 100%;
-  max-width: var(--clock-size);
-  justify-content: center;
-  /* Center the elements horizontally */
-}
-
-.time-inputs input {
-  width: 80px;
-  /* Set a fixed width for the time input */
-  padding: 0.5rem;
-  font-size: 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  text-align: center;
-  /* Center the text inside the input */
-}
-
-.time-inputs button {
-  width: auto;
-  /* Let button size to content */
-  min-width: 50px;
-  /* Minimum width for toggle button */
-  padding: 0.5rem;
-  font-size: 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  text-align: center;
-  /* Center the text */
-  flex-shrink: 0;
-  /* Prevent button from shrinking */
-}
-
-.time-inputs input[type="number"] {
-  -moz-appearance: textfield;
-  appearance: auto;
-}
-
-.time-inputs input[type="number"]::-webkit-outer-spin-button,
-.time-inputs input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: auto;
-  margin: 0;
-}
-
-.clock-label {
-  font-size: 1.25rem;
-  font-weight: bold;
-  margin-bottom: var(--spacing-sm);
-  text-align: center;
-}
-
-/* Color scale styles */
+// Color scale styles
 .color-scale-container {
   width: 100%;
   max-width: 100%;
   margin: var(--spacing-lg) auto;
+
+  .color-scale {
+    height: 30px;
+    width: 100%;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: linear-gradient(to right, rgb(13, 8, 135), rgb(85, 0, 170), rgb(156, 23, 158), rgb(205, 62, 78), rgb(246, 147, 34), rgb(252, 225, 56));
+  }
+
+  .color-scale-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--spacing-sm);
+    font-size: 0.875rem;
+  }
+
+  .color-scale-title {
+    font-weight: bold;
+    margin-bottom: var(--spacing-sm);
+    text-align: center;
+  }
+
+  .color-scale-axis-label {
+    display: block;
+    text-align: center;
+    font-size: 0.875rem;
+    margin-top: var(--spacing-sm);
+    color: var(--color-text);
+  }
 }
 
-.color-scale {
-  height: 30px;
-  width: 100%;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: linear-gradient(to right,
-      rgb(13, 8, 135),
-      rgb(85, 0, 170),
-      rgb(156, 23, 158),
-      rgb(205, 62, 78),
-      rgb(246, 147, 34),
-      rgb(252, 225, 56));
-}
-
-.color-scale-labels {
-  display: flex;
-  justify-content: space-between;
-  margin-top: var(--spacing-sm);
-  font-size: 0.875rem;
-}
-
-.color-scale-title {
-  font-weight: bold;
-  margin-bottom: var(--spacing-sm);
-  text-align: center;
-}
-
-/* Add the axis label style */
-.color-scale-axis-label {
-  display: block;
-  text-align: center;
-  font-size: 0.875rem;
-  margin-top: var(--spacing-sm);
-  color: var(--color-text);
-}
-
-/* Solve button container */
+// Solve button container
 .solve-button-container {
   width: 100%;
-  margin-bottom: var(--spacing-lg);
-  margin-top: var(--spacing-lg);
+  margin: var(--spacing-lg) 0;
 }
 
-/* Velocity presets table */
-.velocity-presets-table {
-  width: 100%;
-  margin: var(--spacing-lg) auto;
-  border-collapse: collapse;
-
-  th,
-  td {
-    padding: var(--table-padding-y) var(--table-padding-x);
-    text-align: left;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  th {
-    background-color: #f5f5f5;
-    font-weight: bold;
-  }
-
-  input[type="radio"] {
-    cursor: pointer;
-  }
-
-  input[type="number"] {
-    width: 80px;
-    padding: 5px;
-  }
-
-  label {
-    cursor: pointer;
-    display: inline-block;
-    width: 100%;
-  }
-
-  tr:hover {
-    background-color: #f9f9f9;
-  }
-}
-
-/* NEW: Velocity table wrapper to allow horizontal scrolling */
+// Velocity presets table
 .velocity-table-wrapper {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   margin-bottom: var(--spacing-lg);
+
+  .velocity-presets-table {
+    width: 100%;
+    margin: var(--spacing-lg) auto;
+    border-collapse: collapse;
+
+    th,
+    td {
+      padding: var(--table-padding-y) var(--table-padding-x);
+      text-align: left;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    th {
+      background-color: #f5f5f5;
+      font-weight: bold;
+    }
+
+    input[type="radio"] {
+      cursor: pointer;
+    }
+
+    input[type="number"] {
+      width: 80px;
+      padding: 5px;
+    }
+
+    label {
+      cursor: pointer;
+      display: inline-block;
+      width: 100%;
+    }
+
+    tr:hover {
+      background-color: #f9f9f9;
+    }
+  }
 }
 
-/* Back to Map Button */
+// Back to map button
 .back-to-map-button {
   display: block;
   margin: var(--spacing-lg) auto;
@@ -657,13 +599,20 @@ table {
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #e0e0e0;
+  }
 }
 
-.back-to-map-button:hover {
-  background-color: #e0e0e0;
+// Scroll container
+.scroll-container {
+  width: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Responsive adjustments */
+// Responsive adjustments
 @media (max-width: var(--mobile-breakpoint)) {
   body {
     padding: var(--spacing-sm);
@@ -689,7 +638,6 @@ table {
   }
 }
 
-/* Very narrow screens */
 @media (max-width: var(--narrow-breakpoint)) {
   :root {
     --clock-size: clamp(100px, 40vw, 160px);
@@ -774,7 +722,6 @@ table {
   }
 }
 
-/* Ultra-narrow screens (including 21:9 portrait) */
 @media (max-width: var(--ultra-narrow-breakpoint)) {
   :root {
     --clock-size: clamp(80px, 60vw, 120px);
@@ -834,123 +781,101 @@ table {
   .velocity-presets-table {
     table-layout: fixed;
     font-size: 0.7rem;
-    /* Even smaller font */
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
-  }
-
-  .velocity-presets-table th,
-  .velocity-presets-table td {
-    padding: 0.15rem;
-    word-break: break-word;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .velocity-presets-table th:first-child,
-  .velocity-presets-table td:first-child {
-    width: 8%;
-    min-width: 16px;
-  }
-
-  .velocity-presets-table th:nth-child(2),
-  .velocity-presets-table td:nth-child(2) {
-    width: 34%;
-  }
-
-  .velocity-presets-table th:nth-child(3),
-  .velocity-presets-table th:nth-child(4),
-  .velocity-presets-table td:nth-child(3),
-  .velocity-presets-table td:nth-child(4) {
-    width: 29%;
-  }
-
-  .velocity-presets-table input[type="number"] {
-    width: 100%;
-    max-width: 40px;
-    padding: 0.1rem;
-    font-size: 0.65rem;
-  }
-
-  /* Ultra-narrow screens: force a minimum table width so it doesn't squeeze too much */
-  .velocity-presets-table {
-    table-layout: fixed;
     min-width: 300px;
-    font-size: 0.7rem;
-    /* Reduce font size further if needed */
+    max-width: 100%;
+
+    th,
+    td {
+      padding: 0.15rem;
+      word-break: break-word;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      &:first-child {
+        width: 8%;
+        min-width: 16px;
+      }
+
+      &:nth-child(2) {
+        width: 34%;
+      }
+
+      &:nth-child(3),
+      &:nth-child(4) {
+        width: 29%;
+      }
+    }
+
+    input[type="number"] {
+      width: 100%;
+      max-width: 40px;
+      padding: 0.1rem;
+      font-size: 0.65rem;
+    }
   }
 
-  /* Make the axis label smaller on very narrow screens */
   .color-scale-axis-label {
     font-size: 0.7rem;
   }
 
-  /* For extremely narrow screens */
   @media (max-width: 260px) {
     .velocity-presets-table {
       font-size: 0.6rem;
-    }
 
-    .velocity-presets-table th,
-    .velocity-presets-table td {
-      padding: 0.1rem;
-    }
+      th,
+      td {
+        padding: 0.1rem;
+      }
 
-    .velocity-presets-table input[type="number"] {
-      max-width: 30px;
-      padding: 0.05rem;
-    }
+      input[type="number"] {
+        max-width: 30px;
+        padding: 0.05rem;
+      }
 
-    .velocity-presets-table label {
-      font-size: 0.6rem;
-      line-height: 1;
-    }
+      label {
+        font-size: 0.6rem;
+        line-height: 1;
 
-    /* Force shorter text */
-    .velocity-presets-table label[for="commercialPreset"]::after {
-      content: 'Comm.';
-      display: block;
-      font-size: 0.6rem;
-    }
+        &[for="commercialPreset"] {
+          font-size: 0;
+          &::after {
+            content: 'Comm.';
+            display: block;
+            font-size: 0.6rem;
+          }
+        }
 
-    .velocity-presets-table label[for="commercialPreset"] {
-      font-size: 0;
-    }
+        &[for="concordePreset"] {
+          font-size: 0;
+          &::after {
+            content: 'Conc.';
+            display: block;
+            font-size: 0.6rem;
+          }
+        }
 
-    .velocity-presets-table label[for="concordePreset"]::after {
-      content: 'Conc.';
-      display: block;
-      font-size: 0.6rem;
-    }
+        &[for="extremePreset"] {
+          font-size: 0;
+          &::after {
+            content: 'Extr.';
+            display: block;
+            font-size: 0.6rem;
+          }
+        }
 
-    .velocity-presets-table label[for="concordePreset"] {
-      font-size: 0;
-    }
-
-    .velocity-presets-table label[for="extremePreset"]::after {
-      content: 'Extr.';
-      display: block;
-      font-size: 0.6rem;
-    }
-
-    .velocity-presets-table label[for="extremePreset"] {
-      font-size: 0;
-    }
-
-    .velocity-presets-table label[for="customPreset"]::after {
-      content: 'Cust.';
-      display: block;
-      font-size: 0.6rem;
-    }
-
-    .velocity-presets-table label[for="customPreset"] {
-      font-size: 0;
+        &[for="customPreset"] {
+          font-size: 0;
+          &::after {
+            content: 'Cust.';
+            display: block;
+            font-size: 0.6rem;
+          }
+        }
+      }
     }
   }
 
-  /* Fixes for odd aspect ratios */
   @supports (aspect-ratio: 9/21) {
     body {
       max-width: 95vw;
@@ -965,7 +890,6 @@ table {
   }
 }
 
-/* Landscape orientation adjustments */
 @media (max-width: var(--mobile-breakpoint)) and (orientation: landscape) {
   #map {
     height: 50vh;
@@ -976,7 +900,6 @@ table {
   }
 }
 
-/* Accessibility improvements */
 @media (prefers-contrast: more) {
   button {
     border: 2px solid currentColor;
@@ -987,9 +910,7 @@ table {
   }
 }
 
-/* Animation preferences */
 @media (prefers-reduced-motion: reduce) {
-
   .solution-container,
   #solveButton {
     transition: none;
@@ -1000,7 +921,6 @@ table {
   }
 }
 
-/* Print styles */
 @media print {
   .no-print {
     display: none !important;
@@ -1018,12 +938,4 @@ table {
     border: 1px solid black;
     page-break-inside: avoid;
   }
-}
-
-/* Add explicit scroll container class */
-.scroll-container {
-  width: 100%;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  /* Improve scrolling on iOS */
 }
