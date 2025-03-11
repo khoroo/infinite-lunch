@@ -16,7 +16,7 @@ function createClockDOM(clockSide: 'left' | 'right'): void {
     // Add a centered label above the clock
     const label = document.createElement('div');
     label.className = 'clock-label';
-    label.textContent = (clockSide === 'left') ? 'Arriving' : 'Departing';
+    label.textContent = (clockSide === 'left') ? 'Arrival' : 'Departure';
     clockWrapper.appendChild(label);
 
     const clock = document.createElement('div');
