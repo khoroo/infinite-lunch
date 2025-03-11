@@ -561,12 +561,36 @@ table {
   margin: var(--spacing-lg) var(--spacing-lg);
 }
 
+// Scroll container
+.scroll-container {
+  width: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  
+  /* Hide scrollbars while maintaining scroll functionality */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+}
+
 // Velocity presets table
 .velocity-table-wrapper {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   margin-bottom: var(--spacing-sm);
+  
+  /* Hide scrollbars while maintaining scroll functionality */
+  /* Make sure this is outside any nested selector for Firefox compatibility */
+  scrollbar-width: none !important; /* Firefox - added !important */
+  -ms-overflow-style: none; /* IE and Edge */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+    width: 0;
+    height: 0;
+  }
 
   .velocity-presets-table {
     width: 100%;
@@ -961,5 +985,19 @@ table {
   .solution-container {
     border: 1px solid black;
     page-break-inside: avoid;
+  }
+}
+
+/* Add global scrollbar hiding for Firefox */
+* {
+  scrollbar-color: transparent transparent; /* Firefox */
+}
+
+/* Also hide scrollbars for search results dropdown */
+.search-results {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
   }
 }
