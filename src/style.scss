@@ -517,6 +517,28 @@ table {
   .color-scale-labels {
     display: flex;
     justify-content: space-between;
+    position: relative;
+    padding-top: 10px;
+    margin-top: 5px;
+  }
+
+  .scale-label-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .color-scale-labels {
+    margin-top: 0.25rem;
+    padding-top: 0.25rem;
+  }
+  .scale-label-text {
+    font-size: 12px;
+  }
+
+  .color-scale-labels {
+    display: flex;
+    justify-content: space-between;
     margin-top: var(--spacing-sm);
     font-size: 0.875rem;
   }

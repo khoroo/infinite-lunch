@@ -715,32 +715,43 @@ function setupSearchUI(): void {
 
 
 function updateColorScale(min: number, max: number): void {
-    const labelsContainer = document.querySelector('.color-scale-labels') as HTMLElement;
+    const container = document.querySelector('.color-scale-labels') as HTMLElement;
+    container.innerHTML = '';
 
-    // Clear existing labels
-    labelsContainer.innerHTML = '';
-
-    // Add min label - removed km/h
-    const minLabel = document.createElement('span');
-    minLabel.textContent = `${min}`;
-    labelsContainer.appendChild(minLabel);
-
-    // Add intermediate labels if the range is large enough
     const range = max - min;
-    if (range > 500) {
-        // Add quarter points
-        for (let i = 1; i <= 3; i++) {
-            const value = min + Math.round((range * i) / 4);
-            const label = document.createElement('span');
-            label.textContent = `${value}`; // removed km/h
-            labelsContainer.appendChild(label);
-        }
+    if (range <= 0) return;
+
+    // Round min and max to nearest 100
+    const niceMin = Math.floor(min / 100) * 100;
+    const niceMax = Math.ceil(max / 100) * 100;
+
+    // Choose a step based on the range magnitude
+    let step;
+    if (range > 5000) {
+        step = 1000;
+    } else if (range > 2000) {
+        step = 500;
+    } else if (range > 1000) {
+        step = 200;
+    } else {
+        step = 100;
     }
 
-    // Add max label - removed km/h
-    const maxLabel = document.createElement('span');
-    maxLabel.textContent = `${max}`;
-    labelsContainer.appendChild(maxLabel);
+    // Generate labels without tick marks
+    for (let value = niceMin + step; value < niceMax; value += step) {
+        // Create a wrapper div to hold the label
+        const labelGroup = document.createElement('div');
+        labelGroup.className = 'scale-label-group';
+        
+        // Create text label
+        const label = document.createElement('span');
+        label.className = 'scale-label-text';
+        label.textContent = value.toString();
+        
+        // Add elements to the container
+        labelGroup.appendChild(label);
+        container.appendChild(labelGroup);
+    }
 }
 
 // --- Velocity Preset Configuration ---
