@@ -66,34 +66,51 @@ export function setupMap(): void {
     }
 }
 
-// Add a city marker to the map
-export function addCityMarker(city: City, index: number): void {
-    const iconStyle = new Style({
-        image: new Circle({
-            radius: 14,
-            fill: new Fill({ color: 'rgba(0, 153, 255, 0.6)' }),
-            stroke: new Stroke({ color: '#fff', width: 2 }),
-        }),
-        // text: new Text({
-        //     text: String(index + 1),
-        //     fill: new Fill({ color: '#fff' }),
-        //     font: '12px sans-serif',
-        //     textAlign: 'center',
-        //     textBaseline: 'middle',
-        // }),
+// Modify addCityMarker to accept an optional label parameter
+export function addCityMarker(city: City, _index: number, label?: string | number): void {
+    const circle = new Circle({
+        radius: 14,
+        fill: new Fill({ color: 'rgba(0, 153, 255, 0.6)' }),
+        stroke: new Stroke({ color: '#fff', width: 2 }),
     });
-
+    const textStyle = label != null ? new Text({
+        text: label.toString(),
+        font: 'bold 12px sans-serif',
+        fill: new Fill({ color: '#fff' }),
+        offsetY: 0,             // center text inside marker
+        textAlign: 'center',
+        textBaseline: 'middle'
+    }) : undefined;
+    const iconStyle = new Style({
+        image: circle,
+        text: textStyle
+    });
     const cityFeature = new Feature({
         geometry: new Point(fromLonLat([city.longitude, city.latitude])),
     });
-
+    // mark this feature as a marker so we can clear it later without affecting arcs
+    cityFeature.set('featureType', 'marker');
     cityFeature.setStyle(iconStyle);
     vectorSource.addFeature(cityFeature);
 }
 
+// New function to update markers with visitation order labels
+export function updateCityMarkersWithLabels(visitationOrder: City[]): void {
+    clearCityMarkers();
+    visitationOrder.forEach((city, idx) => {
+        // idx+1 is our label (1, 2, 3, …)
+        addCityMarker(city, idx, idx + 1);
+    });
+}
+
 // Clear all city markers from the map
 export function clearCityMarkers(): void {
-    vectorSource.clear();
+    const features = vectorSource.getFeatures();
+    features.forEach(feature => {
+        if (feature.get('featureType') === 'marker') {
+            vectorSource.removeFeature(feature);
+        }
+    });
 }
 
 // Draw a great circle arc between two cities

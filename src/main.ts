@@ -9,7 +9,7 @@ import { City, ModelData, RouteLeg } from './types';
 import * as mapService from './mapService';
 
 // --- State ---
-const state = {
+let state = {
     cities: [] as City[],
     fuse: null as Fuse<City> | null,
     selectedCities: [] as City[],
@@ -18,7 +18,9 @@ const state = {
     velocityMin: 0,
     velocityMax: 0,
     currentArcs: [] as Feature[],
-    currentRoute: [] as Array<{ from: string, to: string, velocity: number }>
+    currentRoute: [] as Array<{ from: string, to: string, velocity: number }>,
+    // Add new property for visitation order
+    visitationOrder: [] as City[]
 };
 
 // --- Map Integration Functions ---
@@ -448,6 +450,17 @@ function addBackToMapButton(container: HTMLElement): void {
     container.appendChild(backButton);
 }
 
+// Add helper to compute extra leg between the last and first city
+function computeExtraLeg(fromCity: City, toCity: City, velocityMin: number, velocityMax: number): RouteLeg {
+    const distance = calculateDistanceGeodesy(fromCity, toCity); // in meters
+    const avgVelocity = Math.round((velocityMin + velocityMax) / 2);
+    const durationMinutes = Math.round((distance / 1000) / avgVelocity * 60);
+    const hours = Math.floor(durationMinutes / 60);
+    const minutes = durationMinutes % 60;
+    const durationStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    return { from: fromCity.name, to: toCity.name, duration: durationStr, velocity: avgVelocity };
+}
+
 function parseSolution(solution: any, modelData: ModelData, cities: City[], velocityMatrix: number[][]): string {
     const { x } = solution.output.json;
     const edges = modelData.E;
@@ -470,8 +483,7 @@ function parseSolution(solution: any, modelData: ModelData, cities: City[], velo
             const durationMinutes = costs[nextEdgeIndex];
             const durationHours = Math.floor(durationMinutes / 60);
             const remainingMinutes = durationMinutes % 60;
-            const durationString = `${durationHours}hrs ${remainingMinutes}mins`;
-
+            const durationString = `${durationHours.toString().padStart(2, '0')}:${remainingMinutes.toString().padStart(2, '0')}`;
             route.push({ from: cities[currentCityIndex].name, to: cities[nextCityIndex].name, duration: durationString, velocity: velocityMatrix[currentCityIndex][nextCityIndex] });
             currentCityIndex = nextCityIndex;
         } else {
@@ -480,24 +492,31 @@ function parseSolution(solution: any, modelData: ModelData, cities: City[], velo
         }
     }
 
-    // Format durations as HH:MM
-    route = route.map(leg => {
-        const durationParts = leg.duration.split(' ');
-        let legDurationMinutes = 0;
-        durationParts.forEach(part => {
-            if (part.includes('hrs')) {
-                legDurationMinutes += parseInt(part) * 60;
-            } else if (part.includes('mins')) {
-                legDurationMinutes += parseInt(part);
+    // Instead of removing duplicate final city, append extra leg if needed
+    if (route.length > 0 && route[route.length - 1].to !== route[0].from) {
+        const startCity = cities.find(c => c.name === route[0].from)!;
+        const endCity = cities.find(c => c.name === route[route.length - 1].to)!;
+        const extraLeg = computeExtraLeg(endCity, startCity, state.velocityMin, state.velocityMax);
+        route.push(extraLeg);
+    }
+
+    // Compute visitation order without adding the duplicate starting city from the extra leg.
+    let visitationOrder: City[] = [];
+    if (state.selectedCities.length > 0 && route.length > 0) {
+        const firstCity = state.selectedCities.find(c => c.name === route[0].from);
+        if (firstCity) {
+            visitationOrder.push(firstCity);
+        }
+        // Add all cities from the route except when the leg ends in the same city as the first.
+        route.slice(0, route.length - 1).forEach(leg => {
+            const nextCity = state.selectedCities.find(c => c.name === leg.to);
+            if (nextCity) {
+                visitationOrder.push(nextCity);
             }
         });
-
-        const hours = Math.floor(legDurationMinutes / 60);
-        const minutes = legDurationMinutes % 60;
-        const formattedDuration = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-        return { ...leg, duration: formattedDuration };
-    });
-
+    }
+    console.log("Visitation order:", visitationOrder);
+    state = { ...state, visitationOrder };
     const resultHtml = generateRouteHtml(route);
     return `<div class="solution-container">${resultHtml}</div>`;
 }
@@ -933,6 +952,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Draw the route arcs using the updated velocity range
             drawRouteArcs(routeData);
+            // NEW: Update the map markers to show numbered labels following the visitation order
+            console.log("Updating markers with visitation order:", state.visitationOrder);
+            mapService.updateCityMarkersWithLabels(state.visitationOrder);
         } else {
             // Clear state and UI when no route is selected
             state.currentRoute = [];
