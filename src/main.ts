@@ -893,9 +893,9 @@ function updateColorScale(min: number, max: number): void {
 
 // --- Velocity Preset Configuration ---
 const presets = {
-    commercial: { min: 500, max: 900 },
-    concorde: { min: 500, max: 2500 },
     extreme: { min: 13, max: 7200 },
+    concorde: { min: 500, max: 2200 },
+    commercial: { min: 500, max: 900 },
     custom: { min: 13, max: 7200 }
 };
 
