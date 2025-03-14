@@ -912,6 +912,29 @@ table {
   .example-hint {
     font-size: 0.7rem;
   }
+
+  /* Route table adjustments for small screens */
+  .route-table-wrapper,
+  .solution-container .route-table {
+    width: calc(100% + 0.5rem);
+    margin-left: -0.25rem;
+    overflow-x: auto;
+    display: block;
+  }
+
+  .route-table {
+    font-size: 0.75rem;
+    table-layout: fixed;
+    width: 100%;
+    min-width: 400px; /* Prevents collapsing entirely */
+  }
+
+  .route-table th,
+  .route-table td {
+    padding: 0.2rem 0.15rem;
+    font-size: 0.7rem;
+    word-break: break-word;
+  }
 }
 
 @media (max-width: var(--ultra-narrow-breakpoint)) {
