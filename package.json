@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "serve": "vite preview",
-    "deploy": "tsc && vite build && gh-pages -d dist"
+    "serve": "vite preview"
   },
   "devDependencies": {
     "typescript": "^5.8.2",
@@ -17,7 +16,6 @@
     "arc": "^0.1.4",
     "fuse.js": "^7.1.0",
     "geodesy": "^2.4.0",
-    "gh-pages": "^6.3.0",
     "luxon": "^3.5.0",
     "minizinc": "^4.4.1",
     "ol": "latest"
