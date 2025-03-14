@@ -5,12 +5,14 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
+    "gh-pages": "^6.3.0",
+    "sass": "^1.71.1",
     "typescript": "^5.8.2",
-    "vite": "^6.2.0",
-    "sass": "^1.71.1"
+    "vite": "^6.2.0"
   },
   "dependencies": {
     "arc": "^0.1.4",
