@@ -787,6 +787,22 @@ table {
     font-size: 0.9rem;
   }
 
+  .velocity-presets-table {
+    font-size: 0.85rem;
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    
+    th, td {
+      padding: 0.25rem 0.2rem;
+    }
+    
+    input[type="number"] {
+      width: 60px;
+      padding: 3px;
+    }
+  }
+
   .velocity-presets-table th,
   .velocity-presets-table td {
     padding: 0.25rem;
@@ -815,6 +831,86 @@ table {
       gap: var(--spacing-md);
       flex-wrap: wrap;
     }
+  }
+}
+
+/* Add a new media query specifically for screens below 390px */
+@media (max-width: 390px) {
+  body {
+    font-size: 0.8rem;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+  }
+  
+  p {
+    font-size: 0.8rem;
+  }
+  
+  .velocity-table-wrapper {
+    margin: 0 -0.25rem; /* Negative margins to allow table to use full width */
+    width: calc(100% + 0.5rem);
+  }
+
+  .velocity-presets-table {
+    font-size: 0.75rem;
+    table-layout: fixed;
+    
+    th, td {
+      padding: 0.2rem 0.15rem;
+    }
+    
+    input[type="radio"] {
+      transform: scale(0.8);
+    }
+    
+    input[type="number"] {
+      width: 50px;
+      padding: 2px;
+      font-size: 0.7rem;
+    }
+    
+    /* Optimize column widths */
+    th, td {
+      &:first-child {
+        width: 10%;
+        min-width: 20px;
+      }
+      
+      &:nth-child(2) {
+        width: 30%;
+      }
+      
+      &:nth-child(3),
+      &:nth-child(4) {
+        width: 30%;
+      }
+    }
+  }
+
+  #solveButton {
+    font-size: 0.85rem;
+    padding: 0.35rem;
+  }
+  
+  .color-scale-labels, 
+  .color-scale-axis-label {
+    font-size: 0.7rem;
+  }
+  
+  .city-search-input {
+    font-size: 0.8rem;
+    padding: 0.35rem;
+  }
+  
+  .search-results li {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.8rem;
+  }
+  
+  .example-hint {
+    font-size: 0.7rem;
   }
 }
 
