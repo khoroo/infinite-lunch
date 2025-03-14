@@ -558,7 +558,10 @@ table {
 // Solve button container
 .solve-button-container {
   width: 100%;
-  margin: var(--spacing-lg) var(--spacing-lg);
+  margin: var(--spacing-lg) auto; /* Changed from var(--spacing-lg) var(--spacing-lg) to ensure horizontal centering */
+  text-align: center; /* Added to ensure inner content is centered */
+  display: flex; /* Added for better centering capabilities */
+  justify-content: center; /* Centers children horizontally */
 }
 
 // Scroll container
@@ -655,6 +658,40 @@ table {
   -webkit-overflow-scrolling: touch;
 }
 
+// Footer styles
+.footer {
+  width: 100%;
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-sm) 0;
+  text-align: center;
+  
+  hr {
+    width: 100%;
+    border: 0;
+    height: 1px;
+    background-color: var(--color-border);
+    margin: 0 0 var(--spacing-md) 0;
+  }
+  
+  .footer-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-lg);
+    
+    a {
+      color: var(--color-text);
+      text-decoration: none;
+      transition: color 0.2s ease;
+      
+      &:hover {
+        color: var(--color-primary);
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
 // Responsive adjustments
 @media (max-width: var(--mobile-breakpoint)) {
   body {
@@ -678,6 +715,13 @@ table {
   .back-to-map-button {
     padding: 0.4rem 0.8rem;
     font-size: 0.9rem;
+  }
+
+  #solveButton {
+    padding: 0.4rem;
+    font-size: 0.9rem;
+    margin-left: auto; /* Added to ensure centering in mobile view */
+    margin-right: auto; /* Added to ensure centering in mobile view */
   }
 }
 
@@ -762,6 +806,15 @@ table {
   .solver-status {
     padding: var(--spacing-sm);
     font-size: 1rem;
+  }
+
+  .footer {
+    margin-top: var(--spacing-md);
+    
+    .footer-content {
+      gap: var(--spacing-md);
+      flex-wrap: wrap;
+    }
   }
 }
 
