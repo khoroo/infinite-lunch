@@ -63,8 +63,8 @@ function selectCitiesByIndices(indices: number[]): void {
     }
 }
 
-// Update URL with current selected city indices
-function updateUrlWithSelectedCities(): void {
+// Update URL with current state (selected cities and velocity presets)
+function updateUrlWithState(): void {
     const cityIndices = state.selectedCities.map(selectedCity => 
         state.cities.findIndex(city => 
             city.name === selectedCity.name && city.country_code === selectedCity.country_code
@@ -74,11 +74,27 @@ function updateUrlWithSelectedCities(): void {
     // Create a URL that works across different deployments
     const url = new URL(window.location.href);
     
+    // Update city indices
     if (cityIndices.length > 0) {
         url.searchParams.set('cities', cityIndices.join(','));
     } else {
         url.searchParams.delete('cities');
     }
+    
+    // Update velocity parameters
+    url.searchParams.set('vmin', state.velocityMin.toString());
+    url.searchParams.set('vmax', state.velocityMax.toString());
+    
+    // Find which preset is currently active
+    let activePreset = 'custom';
+    for (const [presetName, presetValues] of Object.entries(presets)) {
+        if (presetValues.min === state.velocityMin && presetValues.max === state.velocityMax) {
+            activePreset = presetName;
+            break;
+        }
+    }
+    
+    url.searchParams.set('preset', activePreset);
     
     window.history.replaceState({}, '', url.toString());
 }
@@ -113,7 +129,7 @@ function selectCity(city: City): void {
         updateSelectedCitiesUI();
         
         // Update URL with the new selection
-        updateUrlWithSelectedCities();
+        updateUrlWithState();
 
         // Scroll to the selected cities container
         const selectedCitiesContainer = document.querySelector('.selected-cities');
@@ -148,7 +164,7 @@ function removeCity(city: City): void {
         mapService.updateMapView(state.selectedCities);
         
         // Update URL after removing a city
-        updateUrlWithSelectedCities();
+        updateUrlWithState();
     }
 }
 
@@ -908,7 +924,9 @@ function setupvelocityPresets(): void {
                     velocityMinInput.value = preset.min.toString();
                     velocityMaxInput.value = preset.max.toString();
                 }
-
+                
+                // Update URL with new velocity presets
+                updateUrlWithState();
             });
         });
 
@@ -917,6 +935,8 @@ function setupvelocityPresets(): void {
             if (!velocityMinInput.disabled) {
                 state.velocityMin = parseInt((event.target as HTMLInputElement).value);
                 updateColorScale(state.velocityMin, state.velocityMax);
+                // Update URL with new custom velocity
+                updateUrlWithState();
             }
         });
 
@@ -924,6 +944,8 @@ function setupvelocityPresets(): void {
             if (!velocityMaxInput.disabled) {
                 state.velocityMax = parseInt((event.target as HTMLInputElement).value);
                 updateColorScale(state.velocityMin, state.velocityMax);
+                // Update URL with new custom velocity
+                updateUrlWithState();
             }
         });
 
@@ -1063,8 +1085,10 @@ function loadCities(): Promise<City[]> {
             });
             console.log(`Loaded ${state.cities.length} cities`);
             
-            // Check for city indices in URL after cities are loaded
+            // Check for parameters in URL after cities are loaded
             const params = parseUrlParams();
+            
+            // Handle city indices
             if (params.has('cities')) {
                 const cityIndices = params.get('cities')!
                     .split(',')
@@ -1072,6 +1096,50 @@ function loadCities(): Promise<City[]> {
                     .filter(index => !isNaN(index));
                 
                 selectCitiesByIndices(cityIndices);
+            }
+            
+            // Handle velocity presets
+            if (params.has('vmin')) {
+                const vmin = parseInt(params.get('vmin')!);
+                if (!isNaN(vmin)) {
+                    state.velocityMin = vmin;
+                }
+            }
+            
+            if (params.has('vmax')) {
+                const vmax = parseInt(params.get('vmax')!);
+                if (!isNaN(vmax)) {
+                    state.velocityMax = vmax;
+                }
+            }
+            
+            // Set preset radio button based on URL
+            if (params.has('preset')) {
+                const presetName = params.get('preset')!;
+                if (presetName in presets) {
+                    const presetRadio = document.querySelector(`input[name="velocityPreset"][value="${presetName}"]`) as HTMLInputElement;
+                    if (presetRadio) {
+                        presetRadio.checked = true;
+                        
+                        // Update input fields if applicable
+                        const velocityMinInput = document.getElementById('velocityMin') as HTMLInputElement;
+                        const velocityMaxInput = document.getElementById('velocityMax') as HTMLInputElement;
+                        
+                        if (presetName === 'custom') {
+                            // Enable custom inputs
+                            velocityMinInput.disabled = false;
+                            velocityMaxInput.disabled = false;
+                        } else {
+                            // Disable custom inputs for fixed presets
+                            velocityMinInput.disabled = true;
+                            velocityMaxInput.disabled = true;
+                        }
+                        
+                        // Set input values
+                        velocityMinInput.value = state.velocityMin.toString();
+                        velocityMaxInput.value = state.velocityMax.toString();
+                    }
+                }
             }
             
             return data;
