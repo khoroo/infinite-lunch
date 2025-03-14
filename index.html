@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="./favicon.ico" />
   <title>Infinite Lunch</title>
-  <script type="module" crossorigin src="https://robert.sparks.me.uk/infinite-lunch/assets/index-Cqu1o2dD.js"></script>
-  <link rel="stylesheet" crossorigin href="https://robert.sparks.me.uk/infinite-lunch/assets/index-pip2Zc_A.css">
+  <script type="module" crossorigin src="https://robert.sparks.me.uk/infinite-lunch/assets/index-BL4M8w_T.js"></script>
+  <link rel="stylesheet" crossorigin href="https://robert.sparks.me.uk/infinite-lunch/assets/index-BUBv7ojg.css">
 </head>
 
 <body>
@@ -32,8 +32,8 @@
         <tr>
           <th></th>
           <th>Preset</th>
-          <th>Min</th>
-          <th>Max</th>
+          <th>Min (km/h)</th>
+          <th>Max (km/h)</th>
         </tr>
         <tr>
           <td><input type="radio" name="velocityPreset" id="extremePreset" value="extreme" checked></td>
@@ -45,7 +45,7 @@
           <td><input type="radio" name="velocityPreset" id="concordePreset" value="concorde"></td>
           <td><label for="concordePreset">Concorde</label></td>
           <td>500</td>
-          <td>2500</td>
+          <td>2200</td>
         </tr>
         <tr>
           <td><input type="radio" name="velocityPreset" id="commercialPreset" value="commercial"></td>
@@ -71,7 +71,7 @@
       <div class="search-results"></div>
       <div class="selected-cities"></div>
     </div>
-    <p class="example-hint"><small>Try starting with: <a href="./?cities=10422%2C27632%2C28190">London, New York, Los Angeles</a></small></p>
+    <p class="example-hint"><small>Try starting with: <a href="./?cities=10422%2C27632%2C28190&leftHour=12&leftMinute=0&leftAmPm=PM&rightHour=2&rightMinute=0&rightAmPm=PM">London, New York, Los Angeles</a></small></p>
     <div id="output"></div>
     <!-- Moved solve button container to the bottom -->
     <div class="solve-button-container">
