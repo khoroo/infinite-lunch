@@ -119,11 +119,11 @@ function initializeClock(clockSide: 'left' | 'right', initialHour: number, initi
 
     // Start dragging on mouse down
     hourHand.addEventListener('mousedown', handleDragStart);
-    minuteHand.addEventListener('mousedown', handleDragStart);
+    //minuteHand.addEventListener('mousedown', handleDragStart);
     
     // Add touch event support for mobile
     hourHand.addEventListener('touchstart', handleDragStart, { passive: false });
-    minuteHand.addEventListener('touchstart', handleDragStart, { passive: false });
+    //minuteHand.addEventListener('touchstart', handleDragStart, { passive: false });
 
     // Stop dragging on mouse up or touch end
     const handleDragEnd = (): void => {

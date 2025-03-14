@@ -1156,6 +1156,69 @@ function checkExampleHintVisibility(): void {
     }
 }
 
+// Function to get the clock state from the DOM
+function getClockStateFromDOM(clockSide: 'left' | 'right'): { hour: number, minute: number, ampm: 'AM' | 'PM' } {
+    const timeInput = document.getElementById(`timeInput-${clockSide}`) as HTMLInputElement;
+    const ampmToggle = document.getElementById(`ampmToggle-${clockSide}`) as HTMLButtonElement;
+
+    const [hourStr, minuteStr] = timeInput.value.split(':');
+    const hour = parseInt(hourStr);
+    const minute = parseInt(minuteStr);
+    const ampm = ampmToggle.textContent as 'AM' | 'PM';
+
+    return { hour, minute, ampm };
+}
+
+// Function to update the URL with the clock state
+function updateUrlWithClockState(): void {
+    const url = new URL(window.location.href);
+
+    // Get clock states from both left and right clocks
+    const leftClockState = getClockStateFromDOM('left');
+    const rightClockState = getClockStateFromDOM('right');
+
+    // Set URL parameters for left clock
+    url.searchParams.set('leftHour', leftClockState.hour.toString());
+    url.searchParams.set('leftMinute', leftClockState.minute.toString());
+    url.searchParams.set('leftAmPm', leftClockState.ampm);
+
+    // Set URL parameters for right clock
+    url.searchParams.set('rightHour', rightClockState.hour.toString());
+    url.searchParams.set('rightMinute', rightClockState.minute.toString());
+    url.searchParams.set('rightAmPm', rightClockState.ampm);
+
+    window.history.replaceState({}, '', url.toString());
+}
+
+// Function to parse clock state from URL parameters
+function parseClockStateFromUrl(): void {
+    const params = parseUrlParams();
+
+    // Function to set clock state from URL parameters
+    const setClockStateFromParams = (clockSide: 'left' | 'right') => {
+        const hourParam = params.get(`${clockSide}Hour`);
+        const minuteParam = params.get(`${clockSide}Minute`);
+        const ampmParam = params.get(`${clockSide}AmPm`);
+
+        if (hourParam && minuteParam && ampmParam) {
+            const hour = parseInt(hourParam);
+            const minute = parseInt(minuteParam);
+            const ampm = ampmParam as 'AM' | 'PM';
+
+            // Update the clock state in the DOM
+            const timeInput = document.getElementById(`timeInput-${clockSide}`) as HTMLInputElement;
+            const ampmToggle = document.getElementById(`ampmToggle-${clockSide}`) as HTMLButtonElement;
+
+            timeInput.value = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+            ampmToggle.textContent = ampm;
+        }
+    };
+
+    // Set clock states for both left and right clocks
+    setClockStateFromParams('left');
+    setClockStateFromParams('right');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initialize();
     setupSolveButton(state);
@@ -1165,6 +1228,28 @@ document.addEventListener('DOMContentLoaded', () => {
     setupRouteKeyboardNavigation();
     setupKeyboardShortcuts(); // Add this line to set up keyboard shortcuts
     checkExampleHintVisibility(); // Add this line to check hint visibility on page load
+    parseClockStateFromUrl(); // Parse clock state from URL on page load
+
+    // Add event listeners to clock elements to update URL
+    const leftAmpmToggle = document.getElementById('ampmToggle-left');
+    leftAmpmToggle?.addEventListener('click', updateUrlWithClockState);
+
+    const rightAmpmToggle = document.getElementById('ampmToggle-right');
+    rightAmpmToggle?.addEventListener('click', updateUrlWithClockState);
+
+    const leftTimeInput = document.getElementById('timeInput-left');
+    leftTimeInput?.addEventListener('input', updateUrlWithClockState);
+
+    const rightTimeInput = document.getElementById('timeInput-right');
+    rightTimeInput?.addEventListener('input', updateUrlWithClockState);
+
+    // Dispatch a custom event when the hour hand is dragged
+    document.addEventListener('mouseup', () => {
+        updateUrlWithClockState();
+    });
+    document.addEventListener('touchend', () => {
+        updateUrlWithClockState();
+    });
 
     document.addEventListener('solution-click', (event: Event) => {
         const customEvent = event as CustomEvent;
