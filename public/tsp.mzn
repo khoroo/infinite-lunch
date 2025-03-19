@@ -1,4 +1,4 @@
-% 
+% from https://github.com/hakank/hakank/blob/master/minizinc/tsp.mzn
 % Traveling Salesman Problem, integer programming model in MiniZinc.
 % 
 % From GLPK:s example tsp.mod
